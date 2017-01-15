@@ -1,0 +1,6 @@
+timeout 1
+
+title	MortyOS 0.01
+	root (fd0)
+	kernel /MortyOSKernel
+        module /initrd
