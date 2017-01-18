@@ -38,3 +38,7 @@ size_t strnlen(const char* str, size_t maxlen) {
 	}
 	return ret;
 }
+
+void bzero(void *dest, uint32_t len) {
+	memset(dest, 0, len);
+}

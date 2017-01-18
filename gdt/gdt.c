@@ -30,13 +30,13 @@ void initGDT() {
 	// null entry
 	gdtSetGate(0, 0, 0, 0, 0); 
 	// ref to OSDev Wiki to understand the meaning of 'access' 
-	// code seg for kernel, grow down
+	// code seg for kernel
 	gdtSetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
-	// data seg for kernel, grow up
+	// data seg for kernel
 	gdtSetGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
-	// code seg for uesr, grow down
+	// code seg for uesr
 	gdtSetGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
-	// data seg for user, grow up
+	// data seg for user
 	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
 	gdtFlush((uint32_t)&gdtPtr);

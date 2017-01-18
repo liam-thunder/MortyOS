@@ -1,10 +1,10 @@
-#include "types.h"
 #include "console.h"
-#include "string.h"
 #include "gdt.h"
+#include "idt.h"
 int kernEntry() {
 	initGDT();
+	initIDT();
     consoleClear();
-    printf("No No No\n");
+    printf("Hello Morty OS!\n");
 	return 0;
 }

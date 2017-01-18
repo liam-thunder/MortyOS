@@ -20,17 +20,4 @@ void consoleClear();
 
 void printf(const char* str, ...);
 
-
-//void consoleWrite(char *cstr);
-
-//void consoleWriteColor(char *cstr, realColor_t back, realColor_t fore);
-
-//void consoleWriteHex(uint32_t n, realColor_t back, realColor_t fore);
-
-//void consoleWriteDec(uint32_t n, realColor_t back, realColor_t fore);
-
-//void consolePutColor(char c, realColor_t back, realColor_t fore);
-
-//void printfmt(const char* str, va_list args);
-
 #endif
