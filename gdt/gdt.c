@@ -22,6 +22,17 @@ static void gdtSetGate(int32_t num, uint32_t base, uint32_t limit, uint8_t acces
 	gdtEntries[num].granularity |= gran & 0xF0;
 	gdtEntries[num].access = access;
 }
+static void gdtFlush() {
+	memcpy((void*)gdtPtr.base, gdtEntries, (size_t)gdtPtr.limit);
+	asm("lgdtl (gdtPtr)");
+	asm(" movw $0x10, %ax \n \
+		movw %ax, %ds \n \
+		movw %ax, %es \n \
+		movw %ax, %fs \n \
+		movw %ax, %gs \n \
+		ljmp $0x08, $next \n \
+		next: \n");
+}
 
 void initGDT() {
 	gdtPtr.limit = sizeof(gdt_entry_t) * GDT_LEN - 1;
@@ -39,5 +50,6 @@ void initGDT() {
 	// data seg for user
 	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
 
-	gdtFlush((uint32_t)&gdtPtr);
+	gdtFlush();
+	//gdtFlush((uint32_t)&gdtPtr);
 }

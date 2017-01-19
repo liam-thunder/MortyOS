@@ -29,6 +29,5 @@ typedef struct gdt_ptr_t {
 
 void initGDT();
 
-extern void gdtFlush(uint32_t);
 
 #endif
