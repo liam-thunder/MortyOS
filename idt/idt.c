@@ -1,6 +1,6 @@
 #include "string.h"
 #include "idt.h"
-#include "console.h"
+#include "stdio.h"
 
 #define IDT_LEN 256
 
@@ -21,9 +21,29 @@ static void idtSetGate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) 
 	idtEntries[num].flags = flags;
 }
 
+static void RemapPIC() {
+    outb(0x20, 0x11);
+    outb(0xA0, 0x11);
+
+    // Master starts from 32 Interrupt
+    outb(0x21, 0x20);
+
+    // Salve starts from 40 Interrupt
+    outb(0xA1, 0x28);
+
+    outb(0x21, 0x04);
+    outb(0xA1, 0x02);
+
+    outb(0x21, 0x01);
+    outb(0xA1, 0x01);
+
+    outb(0x21, 0x0);
+    outb(0xA1, 0x0);
+}
 extern void idtFlush(uint32_t);
 
 void initIDT() {
+    RemapPIC();
 	memset(&interruptHandlers, 0, sizeof(interrupt_handler_t) * IDT_LEN);
 
 	idtPtr.limit = sizeof(idt_entry_t) * IDT_LEN - 1;
@@ -31,7 +51,7 @@ void initIDT() {
 
 	memset(&idtEntries, 0, sizeof(idt_entry_t) * IDT_LEN);
 	
-    // 0 - 32
+    // 0 - 31 CPU Reserved ISR
 	idtSetGate(0, (uint32_t)isr0, 0x08, 0x8E);
 	idtSetGate(1, (uint32_t)isr1, 0x08, 0x8E);
 	idtSetGate(2, (uint32_t)isr2, 0x08, 0x8E);
@@ -65,6 +85,24 @@ void initIDT() {
     idtSetGate(30, (uint32_t)isr30, 0x08, 0x8E);
     idtSetGate(31, (uint32_t)isr31, 0x08, 0x8E);
 
+    // 32 - 47 IRQ
+    idtSetGate(32, (uint32_t)irq0, 0x08, 0x8E);
+    idtSetGate(33, (uint32_t)irq1, 0x08, 0x8E);
+    idtSetGate(34, (uint32_t)irq2, 0x08, 0x8E);
+    idtSetGate(35, (uint32_t)irq3, 0x08, 0x8E);
+    idtSetGate(36, (uint32_t)irq4, 0x08, 0x8E);
+    idtSetGate(37, (uint32_t)irq5, 0x08, 0x8E);
+    idtSetGate(38, (uint32_t)irq6, 0x08, 0x8E);
+    idtSetGate(39, (uint32_t)irq7, 0x08, 0x8E);
+    idtSetGate(40, (uint32_t)irq8, 0x08, 0x8E);
+    idtSetGate(41, (uint32_t)irq9, 0x08, 0x8E);
+    idtSetGate(42, (uint32_t)irq10, 0x08, 0x8E);
+    idtSetGate(43, (uint32_t)irq11, 0x08, 0x8E);
+    idtSetGate(44, (uint32_t)irq12, 0x08, 0x8E);
+    idtSetGate(45, (uint32_t)irq13, 0x08, 0x8E);
+    idtSetGate(46, (uint32_t)irq14, 0x08, 0x8E);
+    idtSetGate(47, (uint32_t)irq15, 0x08, 0x8E);
+
     idtSetGate(255, (uint32_t)isr255, 0x08, 0x8E);
 
     idtFlush((uint32_t)&idtPtr);
@@ -75,6 +113,14 @@ void isrHandler(registers_t *regs) {
         interruptHandlers[regs->irpNumber](regs);
     else 
         printf("Unhandled interrupt: %d\n", regs->irpNumber);
+}
+
+void irqHandler(registers_t *regs) {
+    // interrupt lager than 40 is handled by slave PIC
+    if(regs->irpNumber >= 40) outb(0xA0, 0x20);
+    outb(0x20, 0x20);
+    if(interruptHandlers[regs->irpNumber])
+        interruptHandlers[regs->irpNumber](regs);
 }
 
 void registersInterruptHandler(uint8_t n, interrupt_handler_t h) {

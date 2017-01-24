@@ -2,6 +2,7 @@
 #define IDT_H
 
 #include "types.h"
+#include "common.h"
 
 typedef struct idt_entry_t {
 	uint16_t baseLow;
@@ -32,11 +33,13 @@ typedef void (*interrupt_handler_t)(registers_t *);
 
 void registersInterruptHandler(uint8_t n, interrupt_handler_t h);
 
+// ISR Part
+
 void isrHandler(registers_t *regs);
 
 void initIDT();
 
-// Interrupt service routine
+// Interrupt service routine CPU Reserved
 // 0 - 19 Special, CPU-dedicated interrupts
 void isr0();        // 0 #DE Division by zero exception
 void isr1();        // 1 #DB Debug exception 
@@ -75,4 +78,45 @@ void isr31();
 
 // 32 - 255 User defined exception
 void isr255();
+
+
+// IRQ Part
+
+// Interrupt Request handle function
+void irqHandler(registers_t *regs);
+
+#define  IRQ0     32    // System timer
+#define  IRQ1     33    // Keyboard
+#define  IRQ2     34    // Cascade interrupt for IRQs 8-15
+#define  IRQ3     35    // COM2
+#define  IRQ4     36    // COM1
+#define  IRQ5     37    // Sound Card
+#define  IRQ6     38    // Floppy disk controller
+#define  IRQ7     39    // First parallel port
+#define  IRQ8     40    // Real time clock
+#define  IRQ9     41    // Open interrupt
+#define  IRQ10    42    // Open interrupt
+#define  IRQ11    43    // Open interrupt
+#define  IRQ12    44    // PS/2 mouse
+#define  IRQ13    45    // CPU co-processor
+#define  IRQ14    46    // IDE0
+#define  IRQ15    47    // IDE1
+
+void irq0();
+void irq1();
+void irq2();
+void irq3();
+void irq4(); 
+void irq5();
+void irq6();
+void irq7();
+void irq8();
+void irq9();
+void irq10();
+void irq11();
+void irq12();
+void irq13();
+void irq14();
+void irq15();
+
 #endif

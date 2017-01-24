@@ -22,6 +22,7 @@ static void gdtSetGate(int32_t num, uint32_t base, uint32_t limit, uint8_t acces
 	gdtEntries[num].granularity |= gran & 0xF0;
 	gdtEntries[num].access = access;
 }
+
 static void gdtFlush() {
 	memcpy((void*)gdtPtr.base, gdtEntries, (size_t)gdtPtr.limit);
 	asm("lgdtl (gdtPtr)");
