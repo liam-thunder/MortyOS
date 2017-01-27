@@ -68,17 +68,21 @@ static uint32_t getuint(va_list *args, int lflag) {
 	else return va_arg(*args, unsigned int);
 }
 
-static void printnum(uint32_t num, uint32_t base, int32_t width, int32_t padc) {
-	if(num >= base) printnum(num / base, base, width - 1, padc);
+static void printnum(uint32_t num, uint32_t base, int32_t width, int32_t padc, int32_t huflag) {
+	if(num >= base) printnum(num / base, base, width - 1, padc, huflag);
 	else {
 		while(--width > 0) 
 			consolePutColor(padc, PRINTF_BACK, PRINTF_FORE);
 	}
-	consolePutColor("0123456789abcdef"[num % base], PRINTF_BACK, PRINTF_FORE);
+	if(huflag == 0)
+		consolePutColor("0123456789abcdef"[num % base], PRINTF_BACK, PRINTF_FORE);
+	else 
+		consolePutColor("0123456789ABCDEF"[num % base], PRINTF_BACK, PRINTF_FORE);
+
 }
 
 static void printfmt(const char* str, va_list args) {
-	int32_t ch, width, precision, base, lflag, altflag;
+	int32_t ch, width, precision, base, lflag, altflag, hexUpperFlag;
 	char padc;
 	const char* p;
 	uint32_t num;
@@ -87,7 +91,7 @@ static void printfmt(const char* str, va_list args) {
 			if(ch == '\0') return;
 			consolePutColor(ch, PRINTF_BACK, PRINTF_FORE);
 		}
-		padc = ' ', width = -1, precision = -1, lflag = 0, altflag = 0;
+		padc = ' ', width = -1, precision = -1, lflag = 0, altflag = 0, hexUpperFlag = 0;
 	reswitch:
 		switch(ch = *(unsigned char *) str++) {
 			case '-':
@@ -167,11 +171,16 @@ static void printfmt(const char* str, va_list args) {
 				num = (uint64_t) (uintptr_t) va_arg(args, void *);
 				base = 16;
 				goto number;
+			case 'X':
+				num = getuint(&args, lflag);
+				base = 16;
+				hexUpperFlag = 1;
+				goto number;
 			case 'x':
 				num = getuint(&args, lflag);
 				base = 16;
 			number:
-				printnum(num, base, width, padc);
+				printnum(num, base, width, padc, hexUpperFlag);
 				break;
 			case '%':
 				consolePutColor(ch, PRINTF_BACK, PRINTF_FORE);	

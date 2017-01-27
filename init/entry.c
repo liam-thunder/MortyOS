@@ -2,13 +2,14 @@
 #include "gdt.h"
 #include "idt.h"
 #include "timer.h"
+#include "pmm.h"
 
 int kernEntry() {
 	initGDT();
 	initIDT();
     consoleClear();
     initTimer(200);
-    asm volatile("sti");
     printf("Hello Morty OS New!\n");
+    showMemMap();
 	return 0;
 }
