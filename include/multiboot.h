@@ -52,7 +52,7 @@ typedef struct multiboot_h
     uint32_t vbe_interface_len;
 } __attribute__((packed)) multiboot_t;
 
-typedef struct mmp_entry_t
+typedef struct mmap_entry_t
 {
 	uint32_t size;
 	// use uint32_t to present 64bits type
