@@ -1,6 +1,6 @@
 #include "stdio.h"
-
-static uint16_t *videoMemory = (uint16_t *)0xB8000;
+#include "vmm.h"
+static uint16_t *videoMemory = (uint16_t *)(0xB8000 + PAGE_OFFSET);
 
 static uint8_t cursorX = 0;
 static uint8_t cursorY = 0;

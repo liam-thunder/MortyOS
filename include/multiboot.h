@@ -63,6 +63,10 @@ typedef struct mmap_entry_t
 	uint32_t type;
 } __attribute__((packed)) mmap_entry_t;
 
+// multiboot_t pointer before paging set up
 extern multiboot_t *glb_mboot_ptr;
+
+// multiboot_t pointer after paging set up
+extern multiboot_t *mboot_ptr_tmp;
 
 #endif

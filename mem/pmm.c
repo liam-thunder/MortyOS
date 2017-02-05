@@ -29,11 +29,16 @@ void initPMM() {
 	for(ptr = start_addr; ptr < end_addr; ptr++) {
 		// type 1 presents useable physical memory area
 		if(ptr->type == 1 && ptr->addrLow == 0x100000) {
-			uint32_t page_addr = ptr->addrLow + (uint32_t)(kern_end - kern_start);
-			uint32_t page_len = ptr->addrLow + ptr->lenLow;
-			while(page_addr < page_len && page_addr <= PMM_MAX_SIZE) {
-				pmmFreePage(page_addr);
-				page_addr += PMM_PAGE_SIZE;
+			uint32_t page_addr_start = ptr->addrLow + (uint32_t)(kern_end - kern_start);
+			uint32_t page_addr_end = ptr->addrLow + ptr->lenLow;
+			//printf("Addr 0x%08X\n", page_addr_start);
+			//printf("Len 0x%08X\n", page_addr_end);
+			//printf("Useable Memory %dMB\n", (page_addr_end-page_addr_start)/(1024*1024));
+			// PMM_MAX_SIZE is max memory size supported(512MB)
+			// page_addr_end - page_addr_start is the size of this part
+			while(page_addr_start < page_addr_end && page_addr_start <= PMM_MAX_SIZE) {
+				pmmFreePage(page_addr_start);
+				page_addr_start += PMM_PAGE_SIZE;
 				phy_page_cnt++;
 			}
 		} 
