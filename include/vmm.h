@@ -1,9 +1,8 @@
 #ifndef VMM_H
 #define VMM_H
-
 #include "types.h"
-#include "pmm.h"
 #include "idt.h"
+
 
 // Page Global Directory
 typedef uint32_t pgd_t;
@@ -47,8 +46,9 @@ typedef uint32_t pte_t;
 #define PAGE_MASK 0xFFFFF000
 
 void initVMM();
-void pageFault();
+void pageFault(registers_t *regs);
 void switchPGD(uint32_t pgd_addr);
 // map physical addr to virtual addr
-void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flag);
+void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags);
+void unmap(pgd_t* pgd, uint32_t v_addr);
 #endif

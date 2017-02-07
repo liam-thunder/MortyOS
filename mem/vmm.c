@@ -1,4 +1,7 @@
 #include "vmm.h"
+#include "pmm.h"
+#include "string.h"
+#include "stdio.h"
 
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
@@ -33,14 +36,53 @@ void pageFault(registers_t *regs) {
 
 	printf("Page fault at 0x%x, virtual faulting address 0x%x\n", regs->eip, cr2);
 	printf("Error Code: %x\n", regs->errorCode);
+
+	// Ref: http://wiki.osdev.org/Exceptions#Error_code
+	if(regs->errorCode & 0x1) printf("Page-protection Violation\n");
+	else printf("Non-present Page\n");
+
+	if(regs->errorCode & 0x2) printf("Write Error\n");
+	else printf("Read Error\n");
+
+	if(regs->errorCode & 0x4) printf("Kernel Model\n");
+	else printf("User Mode\n");
+
+	if(regs->errorCode & 0x8) printf("Reserved Write\n");
+
+	if(regs->errorCode & 0x10) printf("Instruction Fetch\n");
+
+	while(1) ;
 }
 
-void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flag) {
+void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags) {
 	uint32_t pgd_idx = PGD_INDEX(v_addr);
 	uint32_t pte_idx = PTE_INDEX(v_addr);
 
-	pte_t *p = (pte_t*) (pgd[pgd_idx] & PAGE_MASK);
-	if(!p) {
-		p = (pte_t*) pmmAllocPage();
+	pte_t *pte = (pte_t*) (pgd[pgd_idx] & PAGE_MASK);
+	// create a new pte
+	if(!pte) {
+		// alloc physical page for this pte
+		pte = (pte_t*) pmmAllocPage();
+		pgd[pgd_idx] = (uint32_t)pte | PAGE_PRESENT | PAGE_WRITE;
+
+		pte = (pte_t*)((uint32_t)pte + PAGE_OFFSET);
+		bzero(pte, PAGE_SIZE);
+	} else {
+		pte = (pte_t*)((uint32_t)pte + PAGE_OFFSET);
 	}
+
+	pte[pte_idx] = (p_addr & PAGE_MASK) | flags;
+	// clear page cache
+	asm volatile ("invlpg (%0)" : : "a" (v_addr));
+}
+
+void unmap(pgd_t* pgd, uint32_t v_addr) {
+	uint32_t pgd_idx = PGD_INDEX(v_addr);
+	uint32_t pte_idx = PTE_INDEX(v_addr);
+
+	pte_t *pte = (pte_t*) (pgd[pgd_idx] & PAGE_MASK);
+	if(!pte) return;
+	pte[pte_idx] = 0;
+
+	asm volatile ("invlpg (%0)" : : "a" (v_addr));
 }
