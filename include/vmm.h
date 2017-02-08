@@ -48,7 +48,9 @@ typedef uint32_t pte_t;
 void initVMM();
 void pageFault(registers_t *regs);
 void switchPGD(uint32_t pgd_addr);
-// map physical addr to virtual addr
+// map and unmap physical addr to virtual addr
 void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags);
 void unmap(pgd_t* pgd, uint32_t v_addr);
+// get map info
+uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr);
 #endif

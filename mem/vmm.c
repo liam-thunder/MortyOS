@@ -86,3 +86,20 @@ void unmap(pgd_t* pgd, uint32_t v_addr) {
 
 	asm volatile ("invlpg (%0)" : : "a" (v_addr));
 }
+
+uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr) {
+	uint32_t pgd_idx = PGD_INDEX(v_addr);
+	uint32_t pte_idx = PTE_INDEX(v_addr);
+
+	pte_t *pte = (pte_t*) (pgd[pgd_idx] & PAGE_MASK);
+
+	if(!pte) return 0;
+
+	pte = (pte_t*)((uint32_t)pte + PAGE_OFFSET);
+
+	if(pte[pte_idx] != 0 && p_addr_ptr) {
+		*p_addr_ptr = pte[pte_idx] & PAGE_MASK;
+		return 1;
+	}
+	return 0;
+}
