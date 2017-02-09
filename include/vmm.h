@@ -53,4 +53,7 @@ void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags);
 void unmap(pgd_t* pgd, uint32_t v_addr);
 // get map info
 uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr);
+
+extern pgd_t pgd_kern[PGD_SIZE];
+
 #endif

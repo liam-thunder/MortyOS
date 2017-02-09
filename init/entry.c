@@ -88,7 +88,9 @@ int kernInit() {
     allc_addr = pmmAllocPage();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);*/
 
-    initVMM();
+    initVMM();  
+    uint32_t *ptr = (uint32_t*) 0xA0000000;
+    uint32_t test = *ptr;
 
     while (1) {
         asm volatile ("hlt");
