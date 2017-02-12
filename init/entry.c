@@ -5,6 +5,7 @@
 #include "pmm.h"
 #include "string.h"
 #include "vmm.h"
+#include "heap.h"
 
 int kernInit();
 
@@ -68,14 +69,14 @@ int kernInit() {
     initTimer(200);
 
     printf("Hello Morty OS New!\n");
-    printf("kernel in memory start: 0x%08X\n", kern_start);
-    printf("kernel in memory end:   0x%08X\n", kern_end);
-    printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
+    //printf("kernel in memory start: 0x%08X\n", kern_start);
+    //printf("kernel in memory end:   0x%08X\n", kern_end);
+    //printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
     //showMemMap();
 
     initPMM();
 
-    printf("\nThe Count of Physical Memory Page is: %u\n", phy_page_cnt);
+    //printf("\nThe Count of Physical Memory Page is: %u\n", phy_page_cnt);
 
     /*uint32_t allc_addr = NULL;
     printf("Test Physical Memory Alloc :\n");
@@ -89,8 +90,8 @@ int kernInit() {
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);*/
 
     initVMM();  
-    uint32_t *ptr = (uint32_t*) 0xA0000000;
-    uint32_t test = *ptr;
+    
+    testHeap();
 
     while (1) {
         asm volatile ("hlt");
