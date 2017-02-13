@@ -39,7 +39,7 @@ typedef uint32_t pte_t;
 // num of page table entry
 #define PTE_SIZE (PAGE_SIZE / sizeof(uint32_t))
 
-// num of page table (512MB)
+// num of page table (512MB / 4096K = 128)
 #define PTE_COUNT 128
 
 // use mask to clean the last 12 bits

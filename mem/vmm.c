@@ -64,7 +64,7 @@ void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags) {
 		// alloc physical page for this pte
 		pte = (pte_t*) pmmAllocPage();
 		pgd[pgd_idx] = (uint32_t)pte | PAGE_PRESENT | PAGE_WRITE;
-
+		// change the pte to kernel linear addr
 		pte = (pte_t*)((uint32_t)pte + PAGE_OFFSET);
 		bzero(pte, PAGE_SIZE);
 	} else {
@@ -81,6 +81,9 @@ void unmap(pgd_t* pgd, uint32_t v_addr) {
 	uint32_t pte_idx = PTE_INDEX(v_addr);
 
 	pte_t *pte = (pte_t*) (pgd[pgd_idx] & PAGE_MASK);
+
+	pte = (pte_t*) ((uint32_t)pte + PAGE_OFFSET);
+
 	if(!pte) return;
 	pte[pte_idx] = 0;
 

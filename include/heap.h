@@ -20,10 +20,11 @@ typedef struct header
 
 void initHeap();
 
-void* malloc(uint32_t len);
+void* kmalloc(uint32_t len);
 
-void free(void* ptr);
+void kfree(void* ptr);
 
-void testHeap();
+void showHeapDbg();
+
 
 #endif

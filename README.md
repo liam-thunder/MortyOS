@@ -6,4 +6,17 @@ MortyOS is developed for learning purporses, some features may not be perfect.
 ## Done
 * `printf()` function (can't print float/double)
 * few functions in `string.h`
-* protected mode flat memory model
+* protected mode flat memory model(gdt)
+* interrupt handler (idt isr irq)
+* simple physical memory management
+* paging for kernel
+* kernel heap (kmalloc and kfree)
+
+## TODO
+* Buddy Algorithm
+* better kmalloc algorithm
+* keyboard driver
+* mouse driver
+
+### Fun
+Morty is the name of a charactor from *Rick and Morty*(an adult animated science fiction sitcom called).

@@ -1,6 +1,5 @@
 #include "heap.h"
 #include "pmm.h"
-#include "stdio.h"
 #include "vmm.h"
 
 static header_t* heap_head;
@@ -18,7 +17,7 @@ void initHeap() {
 	heap_head = 0;
 }
 
-void* malloc(uint32_t len) {
+void* kmalloc(uint32_t len) {
 	// add the size of header_t to length
 	len += sizeof(header_t);
 
@@ -50,32 +49,27 @@ void* malloc(uint32_t len) {
 	cur->allocated = 1;
 	cur->len = len;
 	if(prev) prev->next = cur;
+	// return the pointer to the start addr of allocated addr
+	// so we have to skip the size of header_t
 	return (void*) (chunk_start + sizeof(header_t));
 }
 
-void free(void* ptr) {
+void kfree(void* ptr) {
 	header_t *h = (header_t*)((uint32_t)ptr - sizeof(header_t));
 	h->allocated = 0;
 	glueChunk(h);
 }
 
-void testHeap() {
-	printf("Test malloc and free\n");
-
-	void* addr1 = malloc(50);
-	printf("malloc 50 bytes in 0x%X\n", addr1);
-	void* addr2 = malloc(500);
-	printf("malloc 500 bytes in 0x%X\n", addr2);
-	void* addr3 = malloc(5000);
-	printf("malloc 5000 bytes in 0x%X\n", addr3);
-
-	printf("free in 0x%X\n", addr1);
-	free(addr1);
-	printf("free in 0x%X\n", addr2);
-	free(addr2);
-	printf("free in 0x%X\n", addr3);
-	free(addr3);
+void showHeapDbg() {
+	header_t* cur = heap_head;
+	printf("\n");
+	while(cur) {
+		printf("[ChunkAddr(0x%X), allocBit(%d), ChunkLen(0x%x)]\n", (uint32_t)cur, cur->allocated, cur->len);
+		cur = cur->next;
+	}
+	printf("\n");
 }
+
 
 // static function
 void allocChunk(uint32_t start, uint32_t len) {

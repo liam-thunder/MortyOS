@@ -56,29 +56,36 @@ __attribute__((section(".init.text"))) void kernEntry() {
     kernInit();
 }
 
-int kernInit() {
-    consoleClear();
-    initTimer(200);
+void testHeap() {
+    printf("Test kmalloc and kfree\n");
+    void* addr1 = kmalloc(50);
+    printf("malloc 50 bytes in 0x%X\n", addr1);
+    //showHeapDbg();
+    void* addr2 = kmalloc(500);
+    printf("malloc 500 bytes in 0x%X\n", addr2);
+    //showHeapDbg();
+    void* addr3 = kmalloc(5000);
+    //printf("malloc 5000 bytes in 0x%X\n", addr3); 
+    showHeapDbg();
+    kfree(addr3);
+    printf("free in 0x%X\n", addr3);
+    showHeapDbg();
+    kfree(addr2);
+    printf("free in 0x%X\n", addr2);
+    showHeapDbg();
+    kfree(addr1);
+    printf("free in 0x%X\n", addr1);
+    showHeapDbg();
+}
 
-    printf("Hello Morty OS New!\n");
-    
-	initGDT();
-	initIDT();
+void TestphyMem() {
+    printf("kernel in memory start: 0x%08X\n", kern_start);
+    printf("kernel in memory end:   0x%08X\n", kern_end);
+    printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
+    showMemMap();
+    printf("\nThe Count of Physical Memory Page is: %u\n", phy_page_cnt);
 
-    consoleClear();
-    initTimer(200);
-
-    printf("Hello Morty OS New!\n");
-    //printf("kernel in memory start: 0x%08X\n", kern_start);
-    //printf("kernel in memory end:   0x%08X\n", kern_end);
-    //printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
-    //showMemMap();
-
-    initPMM();
-
-    //printf("\nThe Count of Physical Memory Page is: %u\n", phy_page_cnt);
-
-    /*uint32_t allc_addr = NULL;
+    uint32_t allc_addr = NULL;
     printf("Test Physical Memory Alloc :\n");
     allc_addr = pmmAllocPage();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
@@ -87,10 +94,21 @@ int kernInit() {
     allc_addr = pmmAllocPage();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
     allc_addr = pmmAllocPage();
-    printf("Alloc Physical Addr: 0x%08X\n", allc_addr);*/
+    printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
+}
 
-    initVMM();  
+int kernInit() {
+    consoleClear();
+    //initTimer(200);
+
+    printf("Hello Morty OS New!\n");
     
+	initGDT();
+	initIDT();
+
+    initPMM();
+    initVMM();  
+
     testHeap();
 
     while (1) {
