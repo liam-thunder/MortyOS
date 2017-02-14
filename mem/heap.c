@@ -14,7 +14,7 @@ static void splitChunk(header_t* chunk, uint32_t len);
 static void glueChunk(header_t* chunk);
 
 void initHeap() {
-	heap_head = 0;
+	heap_head = NULL;
 }
 
 void* kmalloc(uint32_t len) {
@@ -22,7 +22,7 @@ void* kmalloc(uint32_t len) {
 	len += sizeof(header_t);
 
 	header_t* cur = heap_head;
-	header_t* prev = 0;
+	header_t* prev = NULL;
 
 	while(cur) {
 		if(cur->allocated == 0 && cur->len >= len) {
@@ -45,7 +45,7 @@ void* kmalloc(uint32_t len) {
 	allocChunk(chunk_start, len);
 	cur = (header_t*) chunk_start;
 	cur->prev = prev;
-	cur->next = 0;
+	cur->next = NULL;
 	cur->allocated = 1;
 	cur->len = len;
 	if(prev) prev->next = cur;
@@ -82,8 +82,8 @@ void allocChunk(uint32_t start, uint32_t len) {
 }
 
 void freeChunk(header_t* chunk) {
-	if(!chunk->prev) heap_head = 0;
-	else chunk->prev->next = 0;
+	if(!chunk->prev) heap_head = NULL;
+	else chunk->prev->next = NULL;
 
 	while((heap_max - PAGE_SIZE) >= (uint32_t)chunk) {
 		heap_max -= PAGE_SIZE;
@@ -122,5 +122,5 @@ void glueChunk(header_t* chunk) {
 		if(chunk->next) chunk->next->prev = chunk->prev;
 		chunk = chunk->prev;
 	}
-	if(chunk->next == 0) freeChunk(chunk);
+	if(!chunk->next) freeChunk(chunk);
 }
