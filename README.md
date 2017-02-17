@@ -19,4 +19,4 @@ MortyOS is developed for learning purporses, some features may not be perfect.
 * mouse driver
 
 ### Fun
-Morty is the name of a charactor from *Rick and Morty*(an adult animated science fiction sitcom called).
+Morty is the name of a charactor from *Rick and Morty* (an adult animated science fiction sitcom called).
