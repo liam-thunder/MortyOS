@@ -10,7 +10,6 @@
 #define FS_PIPE 0x5
 #define FS_SYMLINK 0x6
 
-// is this dir a mount point
 #define FS_MOUNTPOINT 0x8
 
 struct fs_node;
@@ -20,6 +19,7 @@ struct dirent {
 	uint32_t ino;
 };
 
+
 typedef uint32_t (*read_type_t)(struct fs_node*, uint32_t, uint32_t, uint8_t*);
 typedef uint32_t (*write_type_t)(struct fs_node*, uint32_t, uint32_t, uint8_t*);
 typedef void (*open_type_t)(struct fs_node*);
@@ -27,11 +27,11 @@ typedef void (*close_type_t)(struct fs_node*);
 typedef struct dirent* (*readdir_type_t)(struct fs_node*, uint32_t);
 typedef struct fs_node* (*finddir_type_t)(struct fs_node*, char* name);
 
+
 typedef struct fs_node {
 	char name[128];
-	uint32_t flags;
-	uint32_t length;
-	uint32_t inode;
+	uint32_t file_type;
+	uint32_t file_len;
 
 	read_type_t read;
 	write_type_t write;
@@ -41,9 +41,7 @@ typedef struct fs_node {
 	finddir_type_t finddir;
 
 	struct fs_node *ptr;
-
 } fs_node_t;
-
 
 extern fs_node_t *fs_root;
 
