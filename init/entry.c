@@ -6,6 +6,7 @@
 #include "string.h"
 #include "vmm.h"
 #include "heap.h"
+#include "initrd.h"
 
 int kernInit();
 
@@ -51,8 +52,7 @@ __attribute__((section(".init.text"))) void kernEntry() {
             "xor %%ebp, %%ebp" : : "r" (kern_stack_top));
 
     // move multiboot pointer
-    glb_mboot_ptr = mboot_ptr_tmp + PAGE_OFFSET;
-
+    glb_mboot_ptr = (multiboot_t*)((uint32_t)mboot_ptr_tmp + PAGE_OFFSET);
     kernInit();
 }
 
@@ -97,20 +97,29 @@ void TestphyMem() {
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
 }
 
+void test_initrd_filesystem() {
+    printf("Mod Count: %d\n", glb_mboot_ptr->mods_count);
+    printf("initrd starts at 0x%08X\n", *(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET) + PAGE_OFFSET); 
+    printf("initrd ends at 0x%08X\n", *(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET + 4) + PAGE_OFFSET);
+}
+
 int kernInit() {
     consoleClear();
     //initTimer(200);
 
     printf("Hello Morty OS New!\n");
-    
+
 	initGDT();
 	initIDT();
 
     initPMM();
     initVMM();  
 
+    test_initrd_filesystem();
     testHeap();
+    uint32_t initrd_addr = (*(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET)) + PAGE_OFFSET;
 
+    //fs_root = init_initrd(initrd_addr);
     while (1) {
         asm volatile ("hlt");
     }

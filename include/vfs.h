@@ -20,7 +20,7 @@ struct dirent {
 };
 
 
-typedef uint32_t (*read_type_t)(struct fs_node*, uint32_t, uint32_t, uint8_t*);
+typedef uint32_t (*read_type_t)(struct fs_node*, uint32_t, uint32_t, char*);
 typedef uint32_t (*write_type_t)(struct fs_node*, uint32_t, uint32_t, uint8_t*);
 typedef void (*open_type_t)(struct fs_node*);
 typedef void (*close_type_t)(struct fs_node*);
@@ -45,7 +45,7 @@ typedef struct fs_node {
 
 extern fs_node_t *fs_root;
 
-uint32_t readFS(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
+uint32_t readFS(fs_node_t *node, uint32_t offset, uint32_t size, char *buffer);
 uint32_t writeFS(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
 void openFS(fs_node_t *node, uint8_t read, uint32_t write);
 void closeFS(fs_node_t *node);

@@ -38,6 +38,7 @@ update_image:
 	sudo cp MortyOSKernel /mnt/kernel/MortyOSKernel
 	sudo cp scripts/imgConf/grub.conf /mnt/kernel/boot/grub
 	sudo cp scripts/imgConf/menu.lst /mnt/kernel/boot/grub
+	sudo cp initrd /mnt/kernel/initrd
 	sleep 1
 	sudo umount /mnt/kernel
 

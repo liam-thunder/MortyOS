@@ -42,3 +42,26 @@ size_t strnlen(const char* str, size_t maxlen) {
 void bzero(void *dest, uint32_t len) {
 	memset(dest, 0, len);
 }
+
+char* strcpy(char* dest, const char* src) {
+    if (!dest || !src) return NULL;
+    char* tmp = dest;
+    while ((*tmp++ = *src++) != 0)
+        ;
+    return dest;
+}
+
+char* strncpy(char* dest, const char* src, size_t num) {
+    if (!dest || !src) return NULL;
+    char* tmp = dest;
+    while (num-- > 0 && (*tmp++ = *src++) != 0)
+        ;
+    return dest;
+}
+
+int32_t strcmp(const char* s1, const char* s2) {
+    for (; *s1 == *s2; s1++, s2++)
+        if (*s1 == '\0')
+            return 0;
+    return ((*(unsigned char *)s1 < *(unsigned char *)s2) ? -1 : +1);
+}
