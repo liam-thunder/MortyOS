@@ -3,6 +3,7 @@
 
 #include "types.h"
 
+// 512MB after the kernel space start addr
 #define HEAP_START 0xE0000000
 
 // intrusive list

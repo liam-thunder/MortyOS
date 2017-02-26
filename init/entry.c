@@ -7,6 +7,7 @@
 #include "vmm.h"
 #include "heap.h"
 #include "initrd.h"
+#include "vfs.h"
 
 int kernInit();
 
@@ -51,7 +52,7 @@ __attribute__((section(".init.text"))) void kernEntry() {
     asm volatile ("mov %0, %%esp\n\t"
             "xor %%ebp, %%ebp" : : "r" (kern_stack_top));
 
-    // move multiboot pointer
+    // move multiboot pointer, need to convert mboot_ptr_tmp to uint32_t type first
     glb_mboot_ptr = (multiboot_t*)((uint32_t)mboot_ptr_tmp + PAGE_OFFSET);
     kernInit();
 }
@@ -98,9 +99,29 @@ void TestphyMem() {
 }
 
 void test_initrd_filesystem() {
+    // need to add PAGE_OFFSET to all the address provided by glb_mboot_ptr
     printf("Mod Count: %d\n", glb_mboot_ptr->mods_count);
     printf("initrd starts at 0x%08X\n", *(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET) + PAGE_OFFSET); 
     printf("initrd ends at 0x%08X\n", *(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET + 4) + PAGE_OFFSET);
+
+    uint32_t initrd_addr = (*(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET)) + PAGE_OFFSET;
+
+    fs_root = init_initrd(initrd_addr);
+
+    uint32_t i = 0;
+    struct dirent *node = 0;
+    while((node = readdir_fs(fs_root, i)) != 0) {
+        printf("Found: %s\n", node->name);
+        fs_node_t* fsnode = finddir_fs(fs_root, node->name);
+        if ((fsnode->file_type & 0x7) == FS_DIR) printf("\t(directory)\n");
+        else {
+            printf("\t contents: ");
+            char buffer[256];
+            read_fs(fsnode, 0, 256, buffer);
+            printf("%s\n", buffer);
+        }
+        i++;
+    }
 }
 
 int kernInit() {
@@ -116,10 +137,7 @@ int kernInit() {
     initVMM();  
 
     test_initrd_filesystem();
-    testHeap();
-    uint32_t initrd_addr = (*(uint32_t*)(glb_mboot_ptr->mods_addr + PAGE_OFFSET)) + PAGE_OFFSET;
 
-    //fs_root = init_initrd(initrd_addr);
     while (1) {
         asm volatile ("hlt");
     }

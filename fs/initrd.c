@@ -22,7 +22,7 @@ static fs_node_t *initrd_finddir(fs_node_t *node, char *name);
 
 
 fs_node_t *init_initrd(uint32_t s_addr) {
-	vsb = (super_block_t*) s_addr;
+	vsb = init_superblock(s_addr);
 
 	initrd_root = (fs_node_t*)kmalloc(sizeof(fs_node_t));
 	strcpy(initrd_root->name, "initrd");
@@ -57,6 +57,7 @@ fs_node_t *init_initrd(uint32_t s_addr) {
 	return initrd_root;
 }
 
+// read info of files contained in root dir into root_nodes
 static void read_root_dir(super_block_t* vsb) {
 	inode_t* root_inode = get_inode_ptr(vsb, vfs_root_idx);
     block_t* root_block = get_block_ptr(vsb, root_inode->block_idx[0]);
@@ -64,19 +65,20 @@ static void read_root_dir(super_block_t* vsb) {
     root_nodes = (fs_node_t*)kmalloc(sizeof(fs_node_t) * root_nodes_num);
     for (uint32_t i = 0, file_num = 0; i < root_block->file_num; i++) {
         if (strcmp(root_block->file_name[i], ".") == 0 || strcmp(root_block->file_name[i], "..") == 0) continue;
-        strcpy(root_nodes[file_num++].name, root_block->file_name[i]);
+        strcpy(root_nodes[file_num].name, root_block->file_name[i]);
         inode_t* file_inode = get_inode_ptr(vsb, root_block->file_inode[i]);
-        root_nodes[i].file_len = file_inode->file_size;
-        root_nodes[i].file_type = FS_FILE;
-        root_nodes[i].read = &initrd_read;
-        root_nodes[i].write = 0;
-        root_nodes[i].readdir = 0;
-        root_nodes[i].finddir = 0;
-        root_nodes[i].open = 0;
-        root_nodes[i].close = 0;
+        root_nodes[file_num].file_len = file_inode->file_size;
+        root_nodes[file_num].file_type = FS_FILE;
+        root_nodes[file_num].read = &initrd_read;
+        root_nodes[file_num].write = 0;
+        root_nodes[file_num].readdir = 0;
+        root_nodes[file_num].finddir = 0;
+        root_nodes[file_num].open = 0;
+        root_nodes[file_num++].close = 0;
     }
 }
 
+// read file contents into buffer
 static uint32_t file_read(super_block_t* vsb, char* filename, char* buffer) {
     inode_t* root_inode = get_inode_ptr(vsb, vfs_root_idx);
     block_t* root_block = get_block_ptr(vsb, root_inode->block_idx[0]);

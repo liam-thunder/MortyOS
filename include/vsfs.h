@@ -8,9 +8,11 @@
 // Ref http://pages.cs.wisc.edu/~remzi/OSTEP/
 
 #define BLOCK_SIZE 4096
-#define BLOCK_NUM 64
+#define BLOCK_NUM 32
 #define BITMAP_SIZE (BLOCK_SIZE / sizeof(uint32_t))
 #define DIR_MAX_NUM 32
+#define INODE_BLOCK_NUM 5
+#define FREE_BLOCK_NUM (BLOCK_NUM - INODE_BLOCK_NUM - 3)
 #define MAX_FILE_NAME_LEN 15
 
 typedef struct bitmap {
@@ -49,5 +51,6 @@ typedef struct super_block
 inode_t* get_inode_ptr(super_block_t* vsb, uint32_t inode_idx);
 block_t* get_block_ptr(super_block_t* vsb, uint32_t block_idx);
 void* get_block_data_ptr(super_block_t* vsb, uint32_t block_idx);
+super_block_t* init_superblock(uint32_t s_addr);
 
 #endif

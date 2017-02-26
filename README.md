@@ -11,6 +11,8 @@ MortyOS is developed for learning purporses, some features may not be perfect.
 * simple physical memory management
 * paging for kernel
 * kernel heap (kmalloc and kfree)
+* very naive virtual file system interface
+* initial ramdisk with a simple file system (based on [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/))
 
 ## TODO
 * Buddy Algorithm
