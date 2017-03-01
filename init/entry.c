@@ -129,7 +129,9 @@ int kernInit() {
     //initTimer(200);
 
     printf("Hello Morty OS New!\n");
-
+    printf("kernel in memory start: 0x%08X\n", kern_start);
+    printf("kernel in memory end:   0x%08X\n", kern_end);
+    printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
 	initGDT();
 	initIDT();
 

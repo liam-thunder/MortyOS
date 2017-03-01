@@ -3,6 +3,7 @@
 #include "string.h"
 #include "stdio.h"
 
+// set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
@@ -23,6 +24,8 @@ void initVMM() {
     // reg page fault interrupt
     registersInterruptHandler(14, &pageFault);
 
+    // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
+    // otherwise this call will cause bug
     switchPGD(pgd_kern_phy_addr);
 }
 
