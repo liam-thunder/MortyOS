@@ -138,8 +138,11 @@ int kernInit() {
     initPMM();
     initVMM();  
 
-    test_initrd_filesystem();
-
+    //test_initrd_filesystem();
+    uintptr_t orig_ptr;
+    void* ptr = kmalloc_align(1202, 4096, &orig_ptr);
+    printf("0x%08X\n", ptr);
+    kfree((void*)orig_ptr);
     while (1) {
         asm volatile ("hlt");
     }

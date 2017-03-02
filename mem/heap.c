@@ -70,6 +70,12 @@ void showHeapDbg() {
 	printf("\n");
 }
 
+void* kmalloc_align(uint32_t len, uint32_t alignment, uintptr_t* orig_ptr) {
+	uint32_t mask = alignment - 1;
+    uintptr_t mem = (uintptr_t)kmalloc(len + alignment);
+    *orig_ptr = mem;
+    return (void *)((mem + mask) & ~mask);
+}
 
 // static function
 void allocChunk(uint32_t start, uint32_t len) {

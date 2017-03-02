@@ -27,5 +27,7 @@ void kfree(void* ptr);
 
 void showHeapDbg();
 
+void* kmalloc_align(uint32_t len, uint32_t alignment, uintptr_t* orig_ptr);
+
 
 #endif
