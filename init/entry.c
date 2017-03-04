@@ -132,17 +132,22 @@ int kernInit() {
     printf("kernel in memory start: 0x%08X\n", kern_start);
     printf("kernel in memory end:   0x%08X\n", kern_end);
     printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
-	initGDT();
-	initIDT();
+    initGDT();
+    initIDT();
 
     initPMM();
     initVMM();  
 
+    //testHeap();
     //test_initrd_filesystem();
-    uintptr_t orig_ptr;
-    void* ptr = kmalloc_align(1202, 4096, &orig_ptr);
-    printf("0x%08X\n", ptr);
-    kfree((void*)orig_ptr);
+    pgd_t* new_kern = kmalloc(PGD_SIZE * sizeof(pgd_t));
+    pgd_t* new_kern_1 = kmalloc(PGD_SIZE * sizeof(pgd_t));
+    clone_pgd(new_kern, pgd_kern);
+    uint32_t res;
+    void* tmp = kmalloc(4096*1023);
+    //getMapping(pgd_kern, tmp, &res);
+    clone_pgd(new_kern_1, new_kern);
+    printf("Clone Test Success\n");
     while (1) {
         asm volatile ("hlt");
     }

@@ -33,13 +33,27 @@ typedef uint32_t pte_t;
 // which is the offset in a page
 #define OFFSET_INDEX(x) ((x) & 0xFFF)
 
-// num of page dir entry
-#define PGD_SIZE (PAGE_SIZE / sizeof(pte_t))
+/**
+ * num of page dir entry 
+ * use higher 10 bits to address page table addr,
+ * so the size of page directory table is 1024(0 ~ 2^10-1)
+ */
+//#define PGD_SIZE (PAGE_SIZE / sizeof(pte_t))
+#define PGD_SIZE 1024
 
-// num of page table entry
-#define PTE_SIZE (PAGE_SIZE / sizeof(uint32_t))
+/**
+ * num of page table entry 
+ * use middle 10 bits to address physical page addr,
+ * so the size is also 1024(0 ~ 2^10-1)
+ */
+// #define PTE_SIZE (PAGE_SIZE / sizeof(uint32_t))
+#define PTE_SIZE 1024
 
-// num of page table (512MB / 4096K = 128)
+/**
+ * num of page table
+ * since we manage the 512MB of memory at most
+ * so there will be at most 512MB / 4986K = 128 page tables
+ */ 
 #define PTE_COUNT 128
 
 // use mask to clean the last 12 bits
@@ -55,5 +69,9 @@ void unmap(pgd_t* pgd, uint32_t v_addr);
 uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr);
 
 extern pgd_t pgd_kern[PGD_SIZE];
+
+void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src);
+//extern void copy_page_physical(pte_t* pte_src, pte_t* pte_dst);
+
 
 #endif

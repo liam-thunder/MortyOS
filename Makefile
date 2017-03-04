@@ -52,10 +52,10 @@ umount_image:
 
 .PHONY:qemu
 qemu:
-	qemu -fda floppy.img -boot a
+	qemu -fda floppy.img -boot a -m 512
 
 .PHONY:debug
 debug:
-	qemu -S -s -fda floppy.img -boot a &
+	qemu -S -s -fda floppy.img -m 512 -boot a &
 	sleep 1
 	cgdb -x scripts/gdbinit
