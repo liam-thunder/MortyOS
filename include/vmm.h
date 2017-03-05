@@ -71,7 +71,7 @@ uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr);
 extern pgd_t pgd_kern[PGD_SIZE];
 
 void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src);
-//extern void copy_page_physical(pte_t* pte_src, pte_t* pte_dst);
+
 
 
 #endif

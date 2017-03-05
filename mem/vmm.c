@@ -111,8 +111,11 @@ uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr) {
 }
 
 /**
- * we need paging to locate codes so it's impossible to disable paging here
- * thus it's impossible to copy the physical frame page directly 
+ * we need paging to locate codes so it's impossible to disable paging here.
+ * thus it's impossible to copy the physical frame page directly.
+ * so here the physical addr is added with PAGE_OFFSET to get a virual addr
+ * that lies between 0xC0000000 and 0xE0000000, which is already mapped in 
+ * inital sage of vmm.
  */
 void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src) {
     for(uint32_t i = 0; i < PGD_SIZE; i++) {

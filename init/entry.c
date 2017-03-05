@@ -8,12 +8,14 @@
 #include "heap.h"
 #include "initrd.h"
 #include "vfs.h"
+#include "task.h"
 
 int kernInit();
 
 multiboot_t* glb_mboot_ptr;
 
 char kern_stack[STACK_SIZE];
+uint32_t kern_stack_top;
 
 // Ref: http://wiki.osdev.org/Higher_Half_Kernel
 // 0x00000000 - 0xBFFFFFFF for user
@@ -23,10 +25,11 @@ char kern_stack[STACK_SIZE];
 __attribute__((section(".init.data"))) pgd_t *pgd_tmp  = (pgd_t *)0x1000;
 
 // temp page table low and high start at 0x2000 and 0x3000
+// all the temp page dir/table are aligned with 4096KB(0x1000)
 __attribute__((section(".init.data"))) pgd_t *pte_low  = (pgd_t *)0x2000;
 __attribute__((section(".init.data"))) pgd_t *pte_high = (pgd_t *)0x3000;
 
-__attribute__((section(".init.text"))) void kernEntry() {
+__attribute__((section(".init.text"))) void kernEntry(uint32_t stack_addr) {
     // low page table entry
     pgd_tmp[0] = (uint32_t)pte_low | PAGE_PRESENT | PAGE_WRITE;
     // map high page table entry to PGD_INDEX(0xC0000000)
@@ -48,16 +51,16 @@ __attribute__((section(".init.text"))) void kernEntry() {
     asm volatile ("mov %0, %%cr0" : : "r" (cr0));
 
     // set stack top
-    uint32_t kern_stack_top = ((uint32_t)kern_stack + STACK_SIZE) & 0xFFFFFFF0;
+    kern_stack_top = ((uint32_t)kern_stack + STACK_SIZE) & 0xFFFFFFF0;
     asm volatile ("mov %0, %%esp\n\t"
             "xor %%ebp, %%ebp" : : "r" (kern_stack_top));
-
+    
     // move multiboot pointer, need to convert mboot_ptr_tmp to uint32_t type first
     glb_mboot_ptr = (multiboot_t*)((uint32_t)mboot_ptr_tmp + PAGE_OFFSET);
     kernInit();
 }
 
-void testHeap() {
+void test_heap() {
     printf("Test kmalloc and kfree\n");
     void* addr1 = kmalloc(50);
     printf("malloc 50 bytes in 0x%X\n", addr1);
@@ -124,9 +127,28 @@ void test_initrd_filesystem() {
     }
 }
 
+void test_process() {
+    /*
+    pgd_t* new_kern = kmalloc(PGD_SIZE * sizeof(pgd_t));
+    pgd_t* new_kern_1 = kmalloc(PGD_SIZE * sizeof(pgd_t));
+    clone_pgd(new_kern, pgd_kern);
+    uint32_t res;
+    void* tmp = kmalloc(4096*1023);
+    //getMapping(pgd_kern, tmp, &res);
+    clone_pgd(new_kern_1, new_kern);
+    printf("Clone Test Success\n");*/
+    void* new_stack_start = kmalloc(STACK_SIZE);
+    int k = 100;
+    move_stack(new_stack_start, STACK_SIZE, kern_stack_top);
+    printf("%d\n", k);
+}
+
+
 int kernInit() {
+
     consoleClear();
     //initTimer(200);
+
 
     printf("Hello Morty OS New!\n");
     printf("kernel in memory start: 0x%08X\n", kern_start);
@@ -138,16 +160,12 @@ int kernInit() {
     initPMM();
     initVMM();  
 
-    //testHeap();
+    //test_heap();
     //test_initrd_filesystem();
-    pgd_t* new_kern = kmalloc(PGD_SIZE * sizeof(pgd_t));
-    pgd_t* new_kern_1 = kmalloc(PGD_SIZE * sizeof(pgd_t));
-    clone_pgd(new_kern, pgd_kern);
-    uint32_t res;
-    void* tmp = kmalloc(4096*1023);
-    //getMapping(pgd_kern, tmp, &res);
-    clone_pgd(new_kern_1, new_kern);
-    printf("Clone Test Success\n");
+    test_process();
+
+
+    
     while (1) {
         asm volatile ("hlt");
     }
