@@ -136,11 +136,11 @@ void test_process() {
     void* tmp = kmalloc(4096*1023);
     //getMapping(pgd_kern, tmp, &res);
     clone_pgd(new_kern_1, new_kern);
-    printf("Clone Test Success\n");*/
+    printf("Clone Test Success\n");
     void* new_stack_start = kmalloc(STACK_SIZE);
     int k = 100;
     move_stack(new_stack_start, STACK_SIZE, kern_stack_top);
-    printf("%d\n", k);
+    printf("%d\n", k);*/
 }
 
 

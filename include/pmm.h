@@ -21,6 +21,8 @@ extern uint8_t kern_end[];
 
 extern uint32_t phy_page_cnt;
 
+extern uint32_t kern_stack_top;
+
 void showMemMap();
 
 void initPMM();

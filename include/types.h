@@ -23,4 +23,7 @@ typedef int32_t intptr_t;
 typedef uint32_t uintptr_t;
 
 typedef uint32_t size_t; 
+
+typedef int32_t pid_t;
+
 #endif

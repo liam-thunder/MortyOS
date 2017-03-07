@@ -6,6 +6,8 @@
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
+pgd_t* current_ptr;
+
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
 void initVMM() {
@@ -27,9 +29,11 @@ void initVMM() {
     // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
     // otherwise this call will cause bug
     switchPGD(pgd_kern_phy_addr);
+
 }
 
 void switchPGD(uint32_t pgd_addr) {
+    current_ptr = (pgd_t*)pgd_addr;
     asm volatile ("mov %0, %%cr3" : : "r" (pgd_addr));
 }
 
