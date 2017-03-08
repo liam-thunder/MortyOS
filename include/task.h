@@ -10,7 +10,7 @@ typedef enum task_state
 	TASK_UNIINIT = 0, // task uninitialized
 	TASK_SLEEPING = 1, // sleeping
 	TASK_RUNNABLE = 2, // runnable or running
-	TASK_ZOMBIE = 3,   // zombie state
+	TASK_ZOMBIE = 3,   // has exited but has not yet been cleaned up
 } task_state_t;
 
 typedef struct context
