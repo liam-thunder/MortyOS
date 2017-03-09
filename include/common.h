@@ -12,4 +12,7 @@ uint8_t inb(uint16_t port);
 // read a word from the port
 uint16_t inw(uint16_t port);
 
+// enable interrupt
+void enable_interrupt();
+
 #endif

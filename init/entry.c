@@ -9,6 +9,8 @@
 #include "initrd.h"
 #include "vfs.h"
 #include "task.h"
+#include "common.h"
+#include "sched.h"
 
 int kernInit();
 
@@ -143,11 +145,21 @@ void test_process() {
     printf("%d\n", k);*/
 }
 
+int flag = 0;
+int worker() {
+    while(1) {
+        if(flag == 1) {
+            printf("B");
+            flag = 0;
+        }
+    }
+    return 0;
+}
 
 int kernInit() {
 
     consoleClear();
-    //initTimer(200);
+
 
 
     printf("Hello Morty OS New!\n");
@@ -159,12 +171,20 @@ int kernInit() {
 
     initPMM();
     initVMM();  
-
+    initTimer(200);
     //test_heap();
     //test_initrd_filesystem();
-    test_process();
+    //test_process();
+    init_schedule();
+    kernel_thread(worker, NULL);
+    enable_interrupt();
 
-
+    while(1) {
+        if(flag == 0) {
+            printf("A");
+            flag = 1;
+        }
+    }
     
     while (1) {
         asm volatile ("hlt");

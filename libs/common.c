@@ -16,3 +16,7 @@ inline uint16_t inw(uint16_t port) {
 	return ret;
 }
 
+
+inline void enable_interrupt() {
+	asm volatile ("sti");
+}
