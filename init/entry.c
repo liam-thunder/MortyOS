@@ -12,7 +12,7 @@
 #include "common.h"
 #include "sched.h"
 
-int kernInit();
+int kern_init();
 
 multiboot_t* glb_mboot_ptr;
 
@@ -59,7 +59,7 @@ __attribute__((section(".init.text"))) void kernEntry(uint32_t stack_addr) {
     
     // move multiboot pointer, need to convert mboot_ptr_tmp to uint32_t type first
     glb_mboot_ptr = (multiboot_t*)((uint32_t)mboot_ptr_tmp + PAGE_OFFSET);
-    kernInit();
+    kern_init();
 }
 
 void test_heap() {
@@ -84,7 +84,7 @@ void test_heap() {
     showHeapDbg();
 }
 
-void TestphyMem() {
+void test_phy_mem_alloc() {
     printf("kernel in memory start: 0x%08X\n", kern_start);
     printf("kernel in memory end:   0x%08X\n", kern_end);
     printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
@@ -129,38 +129,38 @@ void test_initrd_filesystem() {
     }
 }
 
-void test_process() {
-    /*
-    pgd_t* new_kern = kmalloc(PGD_SIZE * sizeof(pgd_t));
-    pgd_t* new_kern_1 = kmalloc(PGD_SIZE * sizeof(pgd_t));
-    clone_pgd(new_kern, pgd_kern);
-    uint32_t res;
-    void* tmp = kmalloc(4096*1023);
-    //getMapping(pgd_kern, tmp, &res);
-    clone_pgd(new_kern_1, new_kern);
-    printf("Clone Test Success\n");
-    void* new_stack_start = kmalloc(STACK_SIZE);
-    int k = 100;
-    move_stack(new_stack_start, STACK_SIZE, kern_stack_top);
-    printf("%d\n", k);*/
-}
-
 int flag = 0;
 int worker() {
+    int test_var = 1024;
     while(1) {
         if(flag == 1) {
-            printf("B");
+            printf("New Stack: 0x%08X\n", &test_var);
             flag = 0;
         }
     }
     return 0;
 }
 
-int kernInit() {
+
+void test_process() {
+    initTimer(200);
+    init_schedule();
+    kernel_thread(worker, NULL);
+    enable_interrupt();
+
+    while(1) {
+        int test_var = 2048;
+        if(flag == 0) {
+            printf("Old Stack: 0x%08X\n", &test_var);
+            flag = 1;
+        }
+    }
+}
+
+
+int kern_init() {
 
     consoleClear();
-
-
 
     printf("Hello Morty OS New!\n");
     printf("kernel in memory start: 0x%08X\n", kern_start);
@@ -171,20 +171,11 @@ int kernInit() {
 
     initPMM();
     initVMM();  
-    initTimer(200);
+    
     //test_heap();
     //test_initrd_filesystem();
-    //test_process();
-    init_schedule();
-    kernel_thread(worker, NULL);
-    enable_interrupt();
+    test_process();
 
-    while(1) {
-        if(flag == 0) {
-            printf("A");
-            flag = 1;
-        }
-    }
     
     while (1) {
         asm volatile ("hlt");
