@@ -9,7 +9,6 @@
 #include "initrd.h"
 #include "vfs.h"
 #include "task.h"
-#include "common.h"
 #include "sched.h"
 
 int kern_init();
@@ -32,6 +31,7 @@ __attribute__((section(".init.data"))) pgd_t *pte_low  = (pgd_t *)0x2000;
 __attribute__((section(".init.data"))) pgd_t *pte_high = (pgd_t *)0x3000;
 
 __attribute__((section(".init.text"))) void kernEntry(uint32_t stack_addr) {
+    // we only need two page table for temp paging
     // low page table entry
     pgd_tmp[0] = (uint32_t)pte_low | PAGE_PRESENT | PAGE_WRITE;
     // map high page table entry to PGD_INDEX(0xC0000000)
@@ -143,10 +143,10 @@ int worker() {
 
 
 void test_process() {
+    enable_interrupt();
     initTimer(200);
     init_schedule();
     kernel_thread(worker, NULL);
-    enable_interrupt();
 
     while(1) {
         int test_var = 2048;
@@ -170,11 +170,14 @@ int kern_init() {
     initIDT();
 
     initPMM();
-    initVMM();  
+    init_vmm();  
     
     //test_heap();
     //test_initrd_filesystem();
-    test_process();
+    //test_process();
+    uint32_t phy_addr = 0;
+    getMapping(pgd_kern, (uint32_t)kern_end, &phy_addr);
+    printf("0x08%X\n", phy_addr);
 
     
     while (1) {

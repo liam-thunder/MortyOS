@@ -10,7 +10,11 @@ pgd_t* current_ptr;
 
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
-void initVMM() {
+static void switch_pgd(uint32_t pgd_addr);
+static void enable_paging();
+static void tlb_flush(uint32_t v_addr);
+
+void init_vmm() {
     // map physical addr for the page table (all addr are lowwer than 0xE0000000)
     uint32_t pte_start_idx = PGD_INDEX(PAGE_OFFSET);
     for(int i = pte_start_idx, j = 0; i < PTE_COUNT + pte_start_idx; i++, j++) {
@@ -27,14 +31,10 @@ void initVMM() {
     registersInterruptHandler(14, &pageFault);
 
     // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
-    // otherwise this call will cause bug
-    switchPGD(pgd_kern_phy_addr);
+    // otherwise switch will cause bug
+    enable_paging();
+    switch_pgd(pgd_kern_phy_addr);
 
-}
-
-void switchPGD(uint32_t pgd_addr) {
-    current_ptr = (pgd_t*)pgd_addr;
-    asm volatile ("mov %0, %%cr3" : : "r" (pgd_addr));
 }
 
 void pageFault(registers_t *regs) {
@@ -79,8 +79,8 @@ void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags) {
     }
 
     pte[pte_idx] = (p_addr & PAGE_MASK) | flags;
-    // clear page cache
-    asm volatile ("invlpg (%0)" : : "a" (v_addr));
+
+    tlb_flush(v_addr);
 }
 
 void unmap(pgd_t* pgd, uint32_t v_addr) {
@@ -94,7 +94,7 @@ void unmap(pgd_t* pgd, uint32_t v_addr) {
     if(!pte) return;
     pte[pte_idx] = 0;
 
-    asm volatile ("invlpg (%0)" : : "a" (v_addr));
+    tlb_flush(v_addr);
 }
 
 uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr) {
@@ -136,4 +136,20 @@ void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src) {
                 pte_dst_vir[j] = pte_src_vir[j];
         }
     }
+}
+
+static void enable_paging() {
+    uint32_t cr0;
+    asm volatile ("mov %%cr0, %0" : "=r" (cr0));
+    cr0 |= 0x80000000;
+    asm volatile ("mov %0, %%cr0" : : "r" (cr0));
+}
+
+static void switch_pgd(uint32_t pgd_addr) {
+    current_ptr = (pgd_t*)pgd_addr;
+    asm volatile ("mov %0, %%cr3" : : "r" (pgd_addr));
+}
+
+static void tlb_flush(uint32_t v_addr) {
+    asm volatile ("invlpg (%0)" : : "a" (v_addr));
 }

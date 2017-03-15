@@ -2,6 +2,8 @@
 #include "stdio.h"
 #include "idt.h"
 #include "sched.h"
+#include "common.h"
+
 
 void timerCallback(registers_t *regs) {
     //static uint32_t tick = 0;

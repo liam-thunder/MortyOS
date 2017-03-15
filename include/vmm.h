@@ -59,9 +59,12 @@ typedef uint32_t pte_t;
 // use mask to clean the last 12 bits
 #define PAGE_MASK 0xFFFFF000
 
-void initVMM();
+void init_vmm();
+
+void init_kern_vm();
+
 void pageFault(registers_t *regs);
-void switchPGD(uint32_t pgd_addr);
+
 // map and unmap physical addr to virtual addr
 void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags);
 void unmap(pgd_t* pgd, uint32_t v_addr);
