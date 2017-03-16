@@ -81,7 +81,7 @@ void* kmalloc_align(uint32_t len, uint32_t alignment, uintptr_t* orig_ptr) {
 void allocChunk(uint32_t start, uint32_t len) {
     // alloc memory page to expand heap 
     while(start + len > heap_max) {
-        uint32_t page = pmmAllocPage();
+        uint32_t page = pmm_alloc_page();
         map(pgd_kern, heap_max, page, PAGE_PRESENT | PAGE_WRITE);
         heap_max += PAGE_SIZE;
     }
@@ -96,7 +96,7 @@ void freeChunk(header_t* chunk) {
         uint32_t page;
         getMapping(pgd_kern, heap_max, &page);
         unmap(pgd_kern, heap_max);
-        pmmFreePage(page);
+        pmm_free_page(page);
     }
 }
 

@@ -93,13 +93,13 @@ void test_phy_mem_alloc() {
 
     uint32_t allc_addr = NULL;
     printf("Test Physical Memory Alloc :\n");
-    allc_addr = pmmAllocPage();
+    allc_addr = pmm_alloc_page();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
-    allc_addr = pmmAllocPage();
+    allc_addr = pmm_alloc_page();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
-    allc_addr = pmmAllocPage();
+    allc_addr = pmm_alloc_page();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
-    allc_addr = pmmAllocPage();
+    allc_addr = pmm_alloc_page();
     printf("Alloc Physical Addr: 0x%08X\n", allc_addr);
 }
 
@@ -163,22 +163,19 @@ int kern_init() {
     consoleClear();
 
     printf("Hello Morty OS New!\n");
-    printf("kernel in memory start: 0x%08X\n", kern_start);
-    printf("kernel in memory end:   0x%08X\n", kern_end);
-    printf("kernel in memory used:   %d KB\n", (kern_end - kern_start + 1023) / 1024);
     initGDT();
     initIDT();
 
+
     initPMM();
+    //test_phy_mem_alloc();
     init_vmm();  
-    
     //test_heap();
     //test_initrd_filesystem();
     //test_process();
-    uint32_t phy_addr = 0;
-    getMapping(pgd_kern, (uint32_t)kern_end, &phy_addr);
-    printf("0x08%X\n", phy_addr);
-
+    pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
+    pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
+    clone_pgd(new_pgd_vaddr, pgd_kern);
     
     while (1) {
         asm volatile ("hlt");

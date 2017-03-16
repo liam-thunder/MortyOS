@@ -6,7 +6,7 @@
 // size of process stack
 #define STACK_SIZE 8192
 
-// max size of physical memory (512MB)
+// max size of physical memory supported here(512MB)
 #define PMM_MAX_SIZE 0x20000000
 
 // size of physical memory page frame (4KB)
@@ -27,8 +27,8 @@ void showMemMap();
 
 void initPMM();
 
-uint32_t pmmAllocPage();
+uint32_t pmm_alloc_page();
 
-void pmmFreePage(uint32_t p);
+void pmm_free_page(uint32_t p);
 
 #endif

@@ -6,7 +6,7 @@
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
-pgd_t* current_ptr;
+pgd_t* current_pgd;
 
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
@@ -15,7 +15,8 @@ static void enable_paging();
 static void tlb_flush(uint32_t v_addr);
 
 void init_vmm() {
-    // map physical addr for the page table (all addr are lowwer than 0xE0000000)
+    // init page dir and page tables 
+    // map all 512MB physical addr to virtual addr are between 0xC0000000 to 0xE0000000
     uint32_t pte_start_idx = PGD_INDEX(PAGE_OFFSET);
     for(int i = pte_start_idx, j = 0; i < PTE_COUNT + pte_start_idx; i++, j++) {
         // pte_kern[j] presents the virtual addr of each page table
@@ -23,6 +24,8 @@ void init_vmm() {
         pgd_kern[i] = ((uint32_t) pte_kern[j] - PAGE_OFFSET) | PAGE_PRESENT | PAGE_WRITE;
     }
     uint32_t *pte = (uint32_t *) pte_kern;
+    // map all 512mb physical to the kernel page tables
+    // from 0x1000 -> 0x20000000(512MB)
     for(int i = 1; i < PTE_COUNT * PTE_SIZE; i++) {
         pte[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
     }
@@ -69,7 +72,7 @@ void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags) {
     // create a new pte
     if(!pte) {
         // alloc physical page for this pte
-        pte = (pte_t*) pmmAllocPage();
+        pte = (pte_t*) pmm_alloc_page();
         pgd[pgd_idx] = (uint32_t)pte | PAGE_PRESENT | PAGE_WRITE;
         // change the pte to kernel linear addr
         pte = (pte_t*)((uint32_t)pte + PAGE_OFFSET);
@@ -119,22 +122,18 @@ uint32_t getMapping(pgd_t* pgd, uint32_t v_addr, uint32_t* p_addr_ptr) {
  * thus it's impossible to copy the physical frame page directly.
  * so here the physical addr is added with PAGE_OFFSET to get a virual addr
  * that lies between 0xC0000000 and 0xE0000000, which is already mapped in 
- * inital sage of vmm.
+ * inital stage of vmm.
  */
 void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src) {
     for(uint32_t i = 0; i < PGD_SIZE; i++) {
-        if(pgd_kern[i] == pgd_src[i])
-            pgd_dst[i] = pgd_src[i];
-        else {
-            pte_t *pte_src = (pte_t*) (pgd_src[i] & PAGE_MASK);
-            pte_t *pte_src_vir = (pte_t*)((uint32_t)pte_src + PAGE_OFFSET);
-            if(!pte_src) continue;
-            pte_t* pte_dst = (pte_t*) pmmAllocPage();
-            pgd_dst[i] = (uint32_t) pte_dst | PAGE_PRESENT | PAGE_WRITE;
-            pte_t* pte_dst_vir = (pte_t*)((uint32_t)pte_dst + PAGE_OFFSET);
-            for(uint32_t j = 0; j < PTE_SIZE; j++)
-                pte_dst_vir[j] = pte_src_vir[j];
-        }
+        pte_t *pte_src = (pte_t*) (pgd_src[i] & PAGE_MASK);
+        pte_t *pte_src_vir = (pte_t*)((uint32_t)pte_src + PAGE_OFFSET);
+        if(!pte_src) continue;
+        pte_t* pte_dst = (pte_t*) pmm_alloc_page();
+        pgd_dst[i] = (uint32_t) pte_dst | PAGE_PRESENT | PAGE_WRITE;
+        pte_t* pte_dst_vir = (pte_t*)((uint32_t)pte_dst + PAGE_OFFSET);
+        for(uint32_t j = 0; j < PTE_SIZE; j++)
+            pte_dst_vir[j] = pte_src_vir[j];
     }
 }
 
@@ -146,7 +145,7 @@ static void enable_paging() {
 }
 
 static void switch_pgd(uint32_t pgd_addr) {
-    current_ptr = (pgd_t*)pgd_addr;
+    current_pgd = (pgd_t*)pgd_addr;
     asm volatile ("mov %0, %%cr3" : : "r" (pgd_addr));
 }
 

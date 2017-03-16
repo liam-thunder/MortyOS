@@ -37,7 +37,7 @@ void initPMM() {
             // PMM_MAX_SIZE is max memory size supported(512MB)
             // page_addr_end - page_addr_start is the size of this part
             while(page_addr_start < page_addr_end && page_addr_start <= PMM_MAX_SIZE) {
-                pmmFreePage(page_addr_start);
+                pmm_free_page(page_addr_start);
                 page_addr_start += PMM_PAGE_SIZE;
                 phy_page_cnt++;
             }
@@ -45,13 +45,13 @@ void initPMM() {
     }
 }
 
-uint32_t pmmAllocPage() {
+uint32_t pmm_alloc_page() {
     if(pmm_stack_top == 0) return 0;
     uint32_t page = pmm_stack[pmm_stack_top--];
     return page;
 }
 
-void pmmFreePage(uint32_t p) {
+void pmm_free_page(uint32_t p) {
     if(pmm_stack_top == PMM_PAGE_MAX_NUM) return;
     pmm_stack[++pmm_stack_top] = p;
 }
