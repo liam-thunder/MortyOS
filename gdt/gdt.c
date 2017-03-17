@@ -1,56 +1,40 @@
 #include "gdt.h"
-#include "string.h"
 
-// code and data segment for kernel, code and data segment for user
-// and a null entry, so the size is five
-#define GDT_LEN 5
-
-gdt_entry_t gdtEntries[GDT_LEN];
-
-gdt_ptr_t gdtPtr;
+gdt_entry_t gdt_entries[GDT_LEN];
+gdt_ptr_t gdt_ptr;
 
 extern uint32_t stack;
+extern void gdt_flush(uint32_t);
 
-static void gdtSetGate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
-	gdtEntries[num].baseLow = (base & 0xFFFF);
-	gdtEntries[num].baseMid = (base >> 16) & 0xFF;
-	gdtEntries[num].baseHigh = (base >> 24) & 0xFF;
+static void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran);
 
-	gdtEntries[num].limitLow = (limit & 0xFFFF);
-	gdtEntries[num].granularity = (limit >> 16) & 0x0F;
+void init_gdt() {
+    gdt_ptr.limit = sizeof(gdt_entry_t) * GDT_LEN - 1;
+    gdt_ptr.base = (uint32_t) &gdt_entries; // why & of array name
 
-	gdtEntries[num].granularity |= gran & 0xF0;
-	gdtEntries[num].access = access;
+    // null entry
+    gdt_set_gate(SEL_NULL_IDX, 0, 0, 0, 0); 
+    // ref to OSDev Wiki to understand the meaning of 'access' 
+    // code seg for kernel
+    gdt_set_gate(SEL_KCODE_IDX, 0, 0xFFFFFFFF, 0x9A, 0xCF);
+    // data seg for kernel
+    gdt_set_gate(SEL_KDATA_IDX, 0, 0xFFFFFFFF, 0x92, 0xCF);
+    // code seg for uesr
+    gdt_set_gate(SEL_UCODE_IDX, 0, 0xFFFFFFFF, 0xFA, 0xCF);
+    // data seg for user
+    gdt_set_gate(SEL_UDATA_IDX, 0, 0xFFFFFFFF, 0xF2, 0xCF);
+
+    gdt_flush((uint32_t)&gdt_ptr);
 }
 
-static void gdtFlush() {
-	memcpy((void*)gdtPtr.base, gdtEntries, (size_t)gdtPtr.limit);
-	asm("lgdtl (gdtPtr)");
-	asm(" movw $0x10, %ax \n \
-		movw %ax, %ds \n \
-		movw %ax, %es \n \
-		movw %ax, %fs \n \
-		movw %ax, %gs \n \
-		ljmp $0x08, $next \n \
-		next: \n");
-}
+static void gdt_set_gate(int32_t num, uint32_t base, uint32_t limit, uint8_t access, uint8_t gran) {
+    gdt_entries[num].base_low = (base & 0xFFFF);
+    gdt_entries[num].base_mid = (base >> 16) & 0xFF;
+    gdt_entries[num].base_high = (base >> 24) & 0xFF;
 
-void initGDT() {
-	gdtPtr.limit = sizeof(gdt_entry_t) * GDT_LEN - 1;
-	gdtPtr.base = (uint32_t) &gdtEntries; // why & of array name
+    gdt_entries[num].limit_low = (limit & 0xFFFF);
+    gdt_entries[num].granularity = (limit >> 16) & 0x0F;
 
-	// null entry
-	gdtSetGate(0, 0, 0, 0, 0); 
-	// ref to OSDev Wiki to understand the meaning of 'access' 
-	// code seg for kernel
-	gdtSetGate(1, 0, 0xFFFFFFFF, 0x9A, 0xCF);
-	// data seg for kernel
-	gdtSetGate(2, 0, 0xFFFFFFFF, 0x92, 0xCF);
-	// code seg for uesr
-	gdtSetGate(3, 0, 0xFFFFFFFF, 0xFA, 0xCF);
-	// data seg for user
-	gdtSetGate(4, 0, 0xFFFFFFFF, 0xF2, 0xCF);
-
-	gdtFlush();
-	//gdtFlush((uint32_t)&gdtPtr);
+    gdt_entries[num].granularity |= gran & 0xF0;
+    gdt_entries[num].access = access;
 }

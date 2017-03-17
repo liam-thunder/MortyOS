@@ -163,7 +163,7 @@ int kern_init() {
     consoleClear();
 
     printf("Hello Morty OS New!\n");
-    initGDT();
+    init_gdt();
     initIDT();
 
 
@@ -172,11 +172,13 @@ int kern_init() {
     init_vmm();  
     //test_heap();
     //test_initrd_filesystem();
-    //test_process();
-    pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
+
+    /*pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
     pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
-    clone_pgd(new_pgd_vaddr, pgd_kern);
-    
+    clone_pgd(new_pgd_vaddr, pgd_kern);*/
+    asm volatile ("int $0x3");
+    asm volatile ("int $0x4");
+    test_process();
     while (1) {
         asm volatile ("hlt");
     }

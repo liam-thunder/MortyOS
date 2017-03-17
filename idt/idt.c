@@ -103,7 +103,7 @@ void initIDT() {
     idtSetGate(46, (uint32_t)irq14, 0x08, 0x8E);
     idtSetGate(47, (uint32_t)irq15, 0x08, 0x8E);
 
-    idtSetGate(255, (uint32_t)isr255, 0x08, 0x8E);
+    idtSetGate(128, (uint32_t)isr128, 0x08, 0x8E);
 
     idtFlush((uint32_t)&idtPtr);
 }
