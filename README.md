@@ -13,12 +13,14 @@ MortyOS is developed for learning purporses, some features may not be perfect.
 * kernel heap (kmalloc and kfree)
 * very naive virtual file system interface
 * initial ramdisk with a simple file system (based on [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/))
+* simple kernel thread
 
 ## TODO
 * Buddy Algorithm
 * better kmalloc algorithm
 * keyboard driver
 * mouse driver
+* unix style proccess
 
 ### Fun
 Morty is the name of a charactor from *Rick and Morty* (an adult animated science fiction sitcom called).
