@@ -19,7 +19,7 @@ typedef struct header
 	uint32_t len : 31;
 } header_t;
 
-void initHeap();
+void init_heap();
 
 void* kmalloc(uint32_t len);
 
