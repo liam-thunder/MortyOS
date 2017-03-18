@@ -3,6 +3,9 @@
 
 #include "types.h"
 #include "vmm.h"
+#include "idt.h"
+
+#define MAX_PROC 64
 
 enum proc_state 
 {
@@ -14,6 +17,16 @@ enum proc_state
 	P_ZOMBIE = 5,
 };
 
+typedef struct context
+{
+	uint32_t esp;
+	uint32_t ebp;
+	uint32_t ebx;
+	uint32_t esi;
+	uint32_t edi;
+	//uint32_t eflags;
+} context_t;
+
 typedef struct proc {
 	// size of proc memory (bytes)
 	uint32_t size;
@@ -23,8 +36,13 @@ typedef struct proc {
 	enum proc_state state;
 	int32_t pid;
 	struct proc* parent;
-	struct trapframe *tf;
-
+	registers_t* reg;
+	context_t* context;
+	// process name
+	char name[16];
 } proc_t;
+
+void proc_init();
+void proc_create_inituser();
 
 #endif

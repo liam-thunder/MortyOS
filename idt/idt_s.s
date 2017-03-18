@@ -91,17 +91,19 @@ isr_common_stub:
     call isrHandler
     ; clean up the pushed argument
     add esp, 4
-
-    ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
-    pop gs
-    pop fs
-    pop es
-    pop ds
-    popa
+    jmp common_ret
+    ;pop gs
+    ;pop fs
+    ;pop es
+    ;pop ds
+    ;popa
     ; clean up the pushed error code and isr number
-    add esp, 8
-    iret
+    ;add esp, 8
+    ;iret
 .end:
+
+
+
 
 ; IRQ Part
 %macro IRQ 2
@@ -155,11 +157,25 @@ irq_common_stub:
     call irqHandler
     add esp, 4
 
+    jmp common_ret
+    ;pop gs
+    ;pop fs
+    ;pop es
+    ;pop ds
+    ;popa
+    ;add esp, 8
+    ;iret
+ .end:
+
+ [GLOBAL common_ret]
+common_ret:
+    ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
     pop gs
     pop fs
     pop es
     pop ds
     popa
+    ; clean up the pushed error code and isr number
     add esp, 8
     iret
- .end:
+.end:
