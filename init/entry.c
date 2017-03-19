@@ -8,8 +8,9 @@
 #include "heap.h"
 #include "initrd.h"
 #include "vfs.h"
-#include "task.h"
-#include "sched.h"
+//#include "task.h"
+//#include "sched.h"
+#include "proc.h"
 
 int kern_init();
 
@@ -128,7 +129,7 @@ void test_initrd_filesystem() {
         i++;
     }
 }
-
+/*
 int flag = 0;
 int worker() {
     int test_var = 1024;
@@ -140,7 +141,6 @@ int worker() {
     }
     return 0;
 }
-
 
 void test_process() {
     enable_interrupt();
@@ -155,7 +155,7 @@ void test_process() {
             flag = 1;
         }
     }
-}
+}*/
 
 
 int kern_init() {
@@ -176,9 +176,10 @@ int kern_init() {
     /*pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
     pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
     clone_pgd(new_pgd_vaddr, pgd_kern);*/
-    asm volatile ("int $0x3");
-    asm volatile ("int $0x4");
-    test_process();
+    //asm volatile ("int $0x3");
+    //asm volatile ("int $0x4");
+    //test_process();
+    proc_init();
     while (1) {
         asm volatile ("hlt");
     }

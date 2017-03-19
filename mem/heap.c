@@ -6,14 +6,14 @@ static header_t* heap_head;
 
 static uint32_t heap_max = HEAP_START;
 
-static void allocChunk(uint32_t start, uint32_t len);
-static void freeChunk(header_t* chunk);
+static void alloc_chunk(uint32_t start, uint32_t len);
+static void free_chunk(header_t* chunk);
 // split the chunk into two chunks(chunk(origLen) --> chunk1(len) + chunk2(origLen-len))
-static void splitChunk(header_t* chunk, uint32_t len);
+static void split_chunk(header_t* chunk, uint32_t len);
 // merge chunk with chunks before and after
-static void glueChunk(header_t* chunk);
+static void glue_chunk(header_t* chunk);
 
-void initHeap() {
+void init_heap() {
     heap_head = NULL;
 }
 
@@ -27,7 +27,7 @@ void* kmalloc(uint32_t len) {
     while(cur) {
         if(cur->allocated == 0 && cur->len >= len) {
             // exist a unallocated chunk with enough size 
-            splitChunk(cur, len);
+            split_chunk(cur, len);
             cur->allocated = 1;
             return (void*)((uint32_t)cur + sizeof(header_t));
         }
@@ -42,7 +42,7 @@ void* kmalloc(uint32_t len) {
         heap_head = (header_t*)chunk_start;
     }
     // allocate memory at chunk_start
-    allocChunk(chunk_start, len);
+    alloc_chunk(chunk_start, len);
     cur = (header_t*) chunk_start;
     cur->prev = prev;
     cur->next = NULL;
@@ -57,7 +57,7 @@ void* kmalloc(uint32_t len) {
 void kfree(void* ptr) {
     header_t *h = (header_t*)((uint32_t)ptr - sizeof(header_t));
     h->allocated = 0;
-    glueChunk(h);
+    glue_chunk(h);
 }
 
 void showHeapDbg() {
@@ -78,7 +78,7 @@ void* kmalloc_align(uint32_t len, uint32_t alignment, uintptr_t* orig_ptr) {
 }
 
 // static function
-void allocChunk(uint32_t start, uint32_t len) {
+void alloc_chunk(uint32_t start, uint32_t len) {
     // alloc memory page to expand heap 
     while(start + len > heap_max) {
         uint32_t page = pmm_alloc_page();
@@ -87,7 +87,7 @@ void allocChunk(uint32_t start, uint32_t len) {
     }
 }
 
-void freeChunk(header_t* chunk) {
+void free_chunk(header_t* chunk) {
     if(!chunk->prev) heap_head = NULL;
     else chunk->prev->next = NULL;
 
@@ -100,7 +100,7 @@ void freeChunk(header_t* chunk) {
     }
 }
 
-void splitChunk(header_t* chunk, uint32_t len) {
+void split_chunk(header_t* chunk, uint32_t len) {
     // the left memory should be larger than the size of header_t
     if(chunk->len - len > sizeof(header_t)) {
         // the addr of new chunk
@@ -115,7 +115,7 @@ void splitChunk(header_t* chunk, uint32_t len) {
     }
 }
 
-void glueChunk(header_t* chunk) {
+void glue_chunk(header_t* chunk) {
     // merge the unused chunk after into chunk
     if(chunk->next && chunk->next->allocated == 0) {
         chunk->len = chunk->len + chunk->next->len;
@@ -128,5 +128,5 @@ void glueChunk(header_t* chunk) {
         if(chunk->next) chunk->next->prev = chunk->prev;
         chunk = chunk->prev;
     }
-    if(!chunk->next) freeChunk(chunk);
+    if(!chunk->next) free_chunk(chunk);
 }

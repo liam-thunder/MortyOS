@@ -43,6 +43,6 @@ typedef struct proc {
 } proc_t;
 
 void proc_init();
-void proc_create_inituser();
+//void proc_create_inituser();
 
 #endif
