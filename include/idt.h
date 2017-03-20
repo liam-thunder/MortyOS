@@ -4,12 +4,15 @@
 #include "types.h"
 #include "common.h"
 
+// kernel data segment selector (IDX(2) TI(0) PRL(0))
+#define SEL_KDATA 0x8
+
 typedef struct idt_entry_t {
-    uint16_t baseLow;
-    uint16_t segSelector;
-    uint8_t zeroPart;
+    uint16_t base_low;
+    uint16_t seg_sel;
+    uint8_t zero_part;
     uint8_t flags;
-    uint16_t baseHigh;  
+    uint16_t base_high;  
 } __attribute__((packed)) idt_entry_t;
 
 typedef struct idt_ptr_t {
