@@ -1,26 +1,29 @@
+; kernel data segment selector (IDX(2) TI(0) PRL(0))
+SEL_KDATA EQU 0x10
+
 [GLOBAL idtFlush]
 idtFlush:
-	mov eax, [esp+4]
-	lidt [eax]
-	ret
+    mov eax, [esp+4]
+    lidt [eax]
+    ret
 .end:
 
 ; ISR Part
 %macro ISR_NOERRCODE 1
 [GLOBAL isr%1]
 isr%1:
-	cli
-	push byte 0
-	push byte %1
-	jmp isr_common_stub
+    cli
+    push byte 0
+    push byte %1
+    jmp isr_common_stub
 %endmacro
 
 %macro ISR_ERRCODE 1
 [GLOBAL isr%1]
 isr%1:
-	cli
-	push byte %1
-	jmp isr_common_stub
+    cli
+    push byte %1
+    jmp isr_common_stub
 %endmacro
 
 ISR_NOERRCODE  0
@@ -57,56 +60,59 @@ ISR_NOERRCODE 29
 ISR_NOERRCODE 30
 ISR_NOERRCODE 31
 
-ISR_NOERRCODE 255
+;ISR_NOERRCODE 255
+ISR_NOERRCODE 128
 
 [GLOBAL isr_common_stub]
 [EXTERN isrHandler]
 
 ; interrupt service routine
 isr_common_stub:
-	; push edi,esi,ebp,esp,ebx,edx,ecx,eax
-	pusha
-	mov ax, ds
-	; save the data segment descriptor
-	push eax
+    ; push edi,esi,ebp,esp,ebx,edx,ecx,eax
+    pusha
+    ;mov ax, ds
+    ; save the data segment descriptor
+    ;push eax
+    push ds
+    push es
+    push fs
+    push gs
 
-	; load the kernel data segment descriptor
-	mov ax, 0x10
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
+    ; load the kernel data segment descriptor
+    mov ax, SEL_KDATA
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
 
-	; save the pointer to registers_t struct
-	push esp 
-	call isrHandler
-	; clean up the pushed argument
-	add esp, 4
-
-	; reload the original data segment descriptor
-	pop eax
-	mov ds, ax
-	mov es, ax
-	mov fs, ax
-	mov gs, ax
-	mov ss, ax
-
-	; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
-	popa
-	; clean up the pushed error code and isr number
-	add esp, 8
-	iret
+    ; save the pointer to registers_t struct
+    push esp 
+    call isrHandler
+    ; clean up the pushed argument
+    add esp, 4
+    jmp common_ret
+    ;pop gs
+    ;pop fs
+    ;pop es
+    ;pop ds
+    ;popa
+    ; clean up the pushed error code and isr number
+    ;add esp, 8
+    ;iret
 .end:
+
+
+
 
 ; IRQ Part
 %macro IRQ 2
 [GLOBAL irq%1]
 irq%1:
-	cli
-	push byte 0
-	push byte %2
-	jmp irq_common_stub
+    cli
+    push byte 0
+    push byte %2
+    jmp irq_common_stub
 %endmacro
 
 
@@ -130,12 +136,17 @@ IRQ  15,    47
 [GLOBAL irq_common_stub]
 [EXTERN irqHandler]
 irq_common_stub:
-	pusha
+    pusha
 
-	mov ax, ds
-	push eax
+    ;mov ax, ds
+    ;push eax
 
-	mov ax, 0x10 
+    push ds
+    push es
+    push fs
+    push gs
+
+    mov ax, SEL_KDATA 
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -146,14 +157,25 @@ irq_common_stub:
     call irqHandler
     add esp, 4
 
-    pop ebx         
-    mov ds, bx
-    mov es, bx
-    mov fs, bx
-    mov gs, bx
-    mov ss, bx
+    jmp common_ret
+    ;pop gs
+    ;pop fs
+    ;pop es
+    ;pop ds
+    ;popa
+    ;add esp, 8
+    ;iret
+ .end:
 
+ [GLOBAL common_ret]
+common_ret:
+    ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
+    pop gs
+    pop fs
+    pop es
+    pop ds
     popa
+    ; clean up the pushed error code and isr number
     add esp, 8
     iret
- .end:
+.end:

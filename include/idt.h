@@ -4,28 +4,34 @@
 #include "types.h"
 #include "common.h"
 
+// kernel data segment selector (IDX(2) TI(0) PRL(0))
+#define SEL_KDATA 0x8
+
 typedef struct idt_entry_t {
-	uint16_t baseLow;
-	uint16_t segSelector;
-	uint8_t zeroPart;
-	uint8_t flags;
-	uint16_t baseHigh;	
+    uint16_t base_low;
+    uint16_t seg_sel;
+    uint8_t zero_part;
+    uint8_t flags;
+    uint16_t base_high;  
 } __attribute__((packed)) idt_entry_t;
 
 typedef struct idt_ptr_t {
-	uint16_t limit;
-	uint32_t base;
+    uint16_t limit;
+    uint32_t base;
 } __attribute__((packed)) idt_ptr_t;
 
 typedef struct registers {
-   // Data segment selector
-   uint32_t ds;                  
-   // pusha regs
-   uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-   // Interrupt number and error code
-   uint32_t irpNumber, errorCode;
-   // Pushed by the processor automatically
-   uint32_t eip, cs, eflags, useresp, ss; 
+    // Data segment selector
+    uint32_t gs, fs, es, ds;
+    //uint32_t es;
+    //uint32_t ds;                  
+    //uint32_t gs, fs, es;
+    // pusha regs
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    // Interrupt number and error code
+    uint32_t irpNumber, errorCode;
+    // Pushed by the processor automatically
+    uint32_t eip, cs, eflags, useresp, ss; 
 } registers_t;
 
 // interrupt handler function pointer
@@ -77,8 +83,8 @@ void isr30();
 void isr31();
 
 // 32 - 255 User defined exception
-void isr255();
-
+//void isr255();
+void isr128();
 
 // IRQ Part
 
