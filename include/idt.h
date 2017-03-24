@@ -21,29 +21,82 @@ typedef struct idt_ptr_t {
 } __attribute__((packed)) idt_ptr_t;
 
 typedef struct registers {
-    // Data segment selector
+    // segment selector
     uint32_t gs, fs, es, ds;
-    //uint32_t es;
-    //uint32_t ds;                  
-    //uint32_t gs, fs, es;
     // pusha regs
     uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
     // Interrupt number and error code
-    uint32_t irpNumber, errorCode;
+    uint32_t int_number, error_code;
     // Pushed by the processor automatically
     uint32_t eip, cs, eflags, useresp, ss; 
 } registers_t;
+
+
+#define  ISR0      0
+#define  ISR1      1
+#define  ISR2      2
+#define  ISR3      3
+#define  ISR4      4
+#define  ISR5      5
+#define  ISR6      6
+#define  ISR7      7
+#define  ISR8      8
+#define  ISR9      9
+#define  ISR10    10
+#define  ISR11    11
+#define  ISR12    12
+#define  ISR13    13
+#define  ISR14    14
+#define  ISR15    15
+#define  ISR16    16
+#define  ISR17    17
+#define  ISR18    18
+#define  ISR19    19
+#define  ISR20    20
+#define  ISR21    21
+#define  ISR22    22
+#define  ISR23    23
+#define  ISR24    24
+#define  ISR25    25
+#define  ISR26    26
+#define  ISR27    27
+#define  ISR28    28
+#define  ISR29    29
+#define  ISR30    30
+#define  ISR31    31
+
+#define  IRQ0     32
+#define  IRQ1     33
+#define  IRQ2     34
+#define  IRQ3     35
+#define  IRQ4     36
+#define  IRQ5     37
+#define  IRQ6     38
+#define  IRQ7     39
+#define  IRQ8     40
+#define  IRQ9     41
+#define  IRQ10    42
+#define  IRQ11    43
+#define  IRQ12    44
+#define  IRQ13    45
+#define  IRQ14    46
+#define  IRQ15    47
+
+void init_idt();
 
 // interrupt handler function pointer
 typedef void (*interrupt_handler_t)(registers_t *);
 
 void registersInterruptHandler(uint8_t n, interrupt_handler_t h);
 
-// ISR Part
 
-void isrHandler(registers_t *regs);
+void trap_handler(registers_t *regs);
 
-void initIDT();
+// Interrupt Service Routines handle function
+void isr_handler(registers_t *regs);
+
+// Interrupt Requests handle function
+void irq_handler(registers_t *regs);
 
 // Interrupt service routine CPU Reserved
 // 0 - 19 Special, CPU-dedicated interrupts
@@ -69,7 +122,7 @@ void isr18();       // 18 #MC Machine check exception
 void isr19();       // 19 #XM SIMD flat exception
 
 // 20 - 31 Intel reserved
-void isr20();
+void isr20();      
 void isr21();
 void isr22();
 void isr23();
@@ -82,47 +135,25 @@ void isr29();
 void isr30();
 void isr31();
 
-// 32 - 255 User defined exception
+// 32 - 255 User Defined Interrupts
 //void isr255();
 void isr128();
 
-// IRQ Part
-
-// Interrupt Request handle function
-void irqHandler(registers_t *regs);
-
-#define  IRQ0     32    // System timer
-#define  IRQ1     33    // Keyboard
-#define  IRQ2     34    // Cascade interrupt for IRQs 8-15
-#define  IRQ3     35    // COM2
-#define  IRQ4     36    // COM1
-#define  IRQ5     37    // Sound Card
-#define  IRQ6     38    // Floppy disk controller
-#define  IRQ7     39    // First parallel port
-#define  IRQ8     40    // Real time clock
-#define  IRQ9     41    // Open interrupt
-#define  IRQ10    42    // Open interrupt
-#define  IRQ11    43    // Open interrupt
-#define  IRQ12    44    // PS/2 mouse
-#define  IRQ13    45    // CPU co-processor
-#define  IRQ14    46    // IDE0
-#define  IRQ15    47    // IDE1
-
-void irq0();
-void irq1();
-void irq2();
-void irq3();
-void irq4(); 
-void irq5();
-void irq6();
-void irq7();
-void irq8();
-void irq9();
-void irq10();
-void irq11();
-void irq12();
-void irq13();
-void irq14();
-void irq15();
+void irq0();     // Programmable Interrupt Timer Interrupt
+void irq1();     // Keyboard Interrupt
+void irq2();     // Cascade (used internally by the two PICs. never raised)
+void irq3();     // COM2 (if enabled)    
+void irq4();     // COM1 (if enabled)
+void irq5();     // LPT2 (if enabled) 
+void irq6();     // Floppy Disk
+void irq7();     // LPT1 / Unreliable "spurious" interrupt (usually)
+void irq8();     // CMOS real-time clock (if enabled)
+void irq9();     // Free for peripherals / legacy SCSI / NIC
+void irq10();    // Free for peripherals / SCSI / NIC
+void irq11();    // Free for peripherals / SCSI / NIC
+void irq12();    // PS2 Mouse
+void irq13();    // FPU / Coprocessor / Inter-processor
+void irq14();    // Primary ATA Hard Disk
+void irq15();    // Secondary ATA Hard Disk
 
 #endif

@@ -1,21 +1,20 @@
 ; kernel data segment selector (IDX(2) TI(0) PRL(0))
 SEL_KDATA EQU 0x10
 
-[GLOBAL idtFlush]
-idtFlush:
+[GLOBAL idt_flush]
+idt_flush:
     mov eax, [esp+4]
     lidt [eax]
     ret
 .end:
 
-; ISR Part
 %macro ISR_NOERRCODE 1
 [GLOBAL isr%1]
 isr%1:
     cli
     push byte 0
     push byte %1
-    jmp isr_common_stub
+    jmp common_stub
 %endmacro
 
 %macro ISR_ERRCODE 1
@@ -23,7 +22,7 @@ isr%1:
 isr%1:
     cli
     push byte %1
-    jmp isr_common_stub
+    jmp common_stub
 %endmacro
 
 ISR_NOERRCODE  0
@@ -63,58 +62,14 @@ ISR_NOERRCODE 31
 ;ISR_NOERRCODE 255
 ISR_NOERRCODE 128
 
-[GLOBAL isr_common_stub]
-[EXTERN isrHandler]
-
-; interrupt service routine
-isr_common_stub:
-    ; push edi,esi,ebp,esp,ebx,edx,ecx,eax
-    pusha
-    ;mov ax, ds
-    ; save the data segment descriptor
-    ;push eax
-    push ds
-    push es
-    push fs
-    push gs
-
-    ; load the kernel data segment descriptor
-    mov ax, SEL_KDATA
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
-
-    ; save the pointer to registers_t struct
-    push esp 
-    call isrHandler
-    ; clean up the pushed argument
-    add esp, 4
-    jmp common_ret
-    ;pop gs
-    ;pop fs
-    ;pop es
-    ;pop ds
-    ;popa
-    ; clean up the pushed error code and isr number
-    ;add esp, 8
-    ;iret
-.end:
-
-
-
-
-; IRQ Part
 %macro IRQ 2
 [GLOBAL irq%1]
 irq%1:
     cli
     push byte 0
     push byte %2
-    jmp irq_common_stub
+    jmp common_stub
 %endmacro
-
 
 IRQ   0,    32
 IRQ   1,    33
@@ -133,13 +88,10 @@ IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
 
-[GLOBAL irq_common_stub]
-[EXTERN irqHandler]
-irq_common_stub:
+[GLOBAL common_stub]
+[EXTERN trap_handler]
+common_stub:
     pusha
-
-    ;mov ax, ds
-    ;push eax
 
     push ds
     push es
@@ -154,18 +106,14 @@ irq_common_stub:
     mov ss, ax
 
     push esp
-    call irqHandler
+    call trap_handler
     add esp, 4
 
     jmp common_ret
-    ;pop gs
-    ;pop fs
-    ;pop es
-    ;pop ds
-    ;popa
-    ;add esp, 8
-    ;iret
  .end:
+
+;[GLOBAL isr_common_stub]
+;[EXTERN isrHandler]
 
  [GLOBAL common_ret]
 common_ret:

@@ -6,9 +6,9 @@
 
 
 void timerCallback(registers_t *regs) {
-    //static uint32_t tick = 0;
-    //printf("Tick: %d\n", tick++);
-    schedule();
+    static uint32_t tick = 0;
+    printf("Tick: %d\n", tick++);
+    //schedule();
 }
 
 void initTimer(uint32_t freq) {

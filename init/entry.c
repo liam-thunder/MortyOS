@@ -164,7 +164,7 @@ int kern_init() {
 
     printf("Hello Morty OS New!\n");
     init_gdt();
-    initIDT();
+    init_idt();
 
 
     initPMM();
@@ -176,10 +176,12 @@ int kern_init() {
     /*pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
     pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
     clone_pgd(new_pgd_vaddr, pgd_kern);*/
-    //asm volatile ("int $0x3");
-    //asm volatile ("int $0x4");
+    enable_interrupt();
+    asm volatile ("int $0x3");
+    asm volatile ("int $0x4");
+    initTimer(200);
     //test_process();
-    proc_init();
+    //proc_init();
     while (1) {
         asm volatile ("hlt");
     }

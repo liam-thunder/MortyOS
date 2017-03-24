@@ -45,21 +45,21 @@ void pageFault(registers_t *regs) {
     asm volatile("mov %%cr2, %0" : "=r" (cr2));
 
     printf("Page fault at 0x%x, virtual faulting address 0x%x\n", regs->eip, cr2);
-    printf("Error Code: %x\n", regs->errorCode);
+    printf("Error Code: %x\n", regs->error_code);
 
     // Ref: http://wiki.osdev.org/Exceptions#Error_code
-    if(regs->errorCode & 0x1) printf("Page-protection Violation\n");
+    if(regs->error_code & 0x1) printf("Page-protection Violation\n");
     else printf("Non-present Page\n");
 
-    if(regs->errorCode & 0x2) printf("Write Error\n");
+    if(regs->error_code & 0x2) printf("Write Error\n");
     else printf("Read Error\n");
 
-    if(regs->errorCode & 0x4) printf("Kernel Model\n");
+    if(regs->error_code & 0x4) printf("Kernel Model\n");
     else printf("User Mode\n");
 
-    if(regs->errorCode & 0x8) printf("Reserved Write\n");
+    if(regs->error_code & 0x8) printf("Reserved Write\n");
 
-    if(regs->errorCode & 0x10) printf("Instruction Fetch\n");
+    if(regs->error_code & 0x10) printf("Instruction Fetch\n");
 
     while(1) ;
 }
