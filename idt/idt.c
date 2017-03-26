@@ -11,14 +11,14 @@ idt_ptr_t idt_ptr;
 
 interrupt_handler_t interruptHandlers[IDT_LEN];
 
-static void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t flags) {
-	idt_entries[num].base_low = base & 0xFFFF;
-	idt_entries[num].base_high = (base >> 16) & 0xFFFF;
+static void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type) {
+	idt_entries[num].offset_low = base & 0xFFFF;
+	idt_entries[num].offset_high = (base >> 16) & 0xFFFF;
 
 	idt_entries[num].seg_sel = sel;
 	idt_entries[num].zero_part = 0;
 
-	idt_entries[num].flags = flags;
+    idt_entries[num].type_attr = type;
 }
 
 static void RemapPIC() {

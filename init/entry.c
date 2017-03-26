@@ -178,8 +178,8 @@ int kern_init() {
     clone_pgd(new_pgd_vaddr, pgd_kern);*/
     enable_interrupt();
     asm volatile ("int $0x3");
-    asm volatile ("int $0x4");
-    initTimer(200);
+    //asm volatile ("int $0x4");
+    //initTimer(200);
     //test_process();
     //proc_init();
     while (1) {

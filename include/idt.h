@@ -7,13 +7,26 @@
 // kernel data segment selector (IDX(2) TI(0) PRL(0))
 #define SEL_KDATA 0x8
 
-typedef struct idt_entry_t {
-    uint16_t base_low;
-    uint16_t seg_sel;
-    uint8_t zero_part;
-    uint8_t flags;
-    uint16_t base_high;  
+// Gate Type
+#define GATE_INT_32 0xE   // 32 bits Interrupt Gate
+#define GATE_TRAP_32 0xF  // 32 bits Trap Gate
+#define GATE_TASK_32 0x5  // 32 bits Task Gate
+
+// Descriptor Privilege Level
+#define DPL_U 0x70
+
+// Present and Storage Segment
+#define P_USED 0x80
+
+// Ref http://wiki.osdev.org/Interrupt_Descriptor_Table
+typedef struct idt_entry {
+    uint16_t offset_low;   // lower 16bits offset
+    uint16_t offset_high;  // higher 16bits offset
+    uint16_t seg_sel;      // segment selector
+    uint8_t zero_part;     // reserved zero
+    uint8_t type_attr;     // type and attributes     
 } __attribute__((packed)) idt_entry_t;
+
 
 typedef struct idt_ptr_t {
     uint16_t limit;
