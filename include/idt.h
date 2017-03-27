@@ -19,12 +19,13 @@
 #define P_USED 0x80
 
 // Ref http://wiki.osdev.org/Interrupt_Descriptor_Table
+// be careful with the sequence of fileds
 typedef struct idt_entry {
     uint16_t offset_low;   // lower 16bits offset
-    uint16_t offset_high;  // higher 16bits offset
     uint16_t seg_sel;      // segment selector
     uint8_t zero_part;     // reserved zero
     uint8_t type_attr;     // type and attributes     
+    uint16_t offset_high;  // higher 16bits offset
 } __attribute__((packed)) idt_entry_t;
 
 
