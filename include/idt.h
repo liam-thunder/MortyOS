@@ -96,13 +96,18 @@ typedef struct registers {
 #define  IRQ14    46
 #define  IRQ15    47
 
+#define T_SYSCALL 64
+
 void init_idt();
+
+void remap_pic();
+
+void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type);
 
 // interrupt handler function pointer
 typedef void (*interrupt_handler_t)(registers_t *);
 
-void registersInterruptHandler(uint8_t n, interrupt_handler_t h);
-
+void reg_inter_handler(uint8_t n, interrupt_handler_t h);
 
 void trap_handler(registers_t *regs);
 

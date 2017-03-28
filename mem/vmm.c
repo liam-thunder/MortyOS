@@ -31,7 +31,7 @@ void init_vmm() {
     }
     uint32_t pgd_kern_phy_addr = (uint32_t)pgd_kern - PAGE_OFFSET;
     // reg page fault interrupt
-    registersInterruptHandler(14, &pageFault);
+    reg_inter_handler(14, &pageFault);
 
     // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
     // otherwise switch will cause bug

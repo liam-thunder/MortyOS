@@ -12,7 +12,7 @@ void timerCallback(registers_t *regs) {
 }
 
 void initTimer(uint32_t freq) {
-    registersInterruptHandler(IRQ0, timerCallback);
+    reg_inter_handler(IRQ0, timerCallback);
 
     // Intel 8253/8254 PIT Chip
     // The value send to PIT is input clock(1193180) / our required frequency 
