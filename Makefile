@@ -34,28 +34,40 @@ clean:
 
 .PHONY:update_image
 update_image:
-	sudo mount floppy.img /mnt/kernel
-	sudo cp MortyOSKernel /mnt/kernel/MortyOSKernel
-	sudo cp scripts/imgConf/grub.conf /mnt/kernel/boot/grub
-	sudo cp scripts/imgConf/menu.lst /mnt/kernel/boot/grub
-	sudo cp initrd /mnt/kernel/initrd
+	sudo kpartx -a v_disk.img
+	sudo sleep 1	
+	sudo mount /dev/mapper/loop0p1 /mnt/kernel
+	sudo cp MortyOSKernel /mnt/kernel/boot
+	sudo cp scripts/grub.cfg /mnt/kernel/boot/grub
 	sleep 1
 	sudo umount /mnt/kernel
+	sudo sleep 1
+	sudo kpartx -d v_disk.img
+
+.PHONY:create_image
+create_image:
+	scripts/./create_img.sh
 
 .PHONY:mount_image
 mount_image:
-	sudo mount floppy.img /mnt/kernel
+	sudo kpartx -a v_disk.img
+	sudo sleep 1	
+	sudo mount /dev/mapper/loop0p1 /mnt/kernel
 
 .PHONY:umount_image
 umount_image:
 	sudo umount /mnt/kernel
+	sudo sleep 1
+	sudo kpartx -d v_disk.img
 
 .PHONY:qemu
 qemu:
-	qemu -fda floppy.img -boot a -m 512
+	#qemu -fda floppy.img -boot a -m 512
+	qemu -hda v_disk.img -boot a -m 512
 
 .PHONY:debug
 debug:
-	qemu -S -s -fda floppy.img -m 512 -boot a &
+	#qemu -S -s -fda floppy.img -m 512 -boot a &
+	qemu -S -s -hda v_disk.img -m 512 -boot a &
 	sleep 1
 	cgdb -x scripts/gdbinit

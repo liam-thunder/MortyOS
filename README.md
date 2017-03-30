@@ -14,12 +14,12 @@ MortyOS is developed for learning purporses, some features may not be perfect.
 * very naive virtual file system interface
 * initial ramdisk with a simple file system (based on [Operating Systems: Three Easy Pieces](http://pages.cs.wisc.edu/~remzi/OSTEP/))
 * simple kernel thread
+* booting from virtual hard disk using grub instead of grub legacy
 
 ## TODO
 * Buddy Algorithm
 * better kmalloc algorithm
-* keyboard driver
-* mouse driver
+* drivers
 * unix style proccess
 
 ### Fun
