@@ -1,8 +1,8 @@
 #include "timer.h"
-#include "stdio.h"
+#include "common/stdio.h"
 #include "idt.h"
 #include "sched.h"
-#include "common.h"
+#include "common/common.h"
 
 
 void timerCallback(registers_t *regs) {

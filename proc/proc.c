@@ -1,5 +1,5 @@
 #include "proc.h"
-#include "pmm.h"
+#include "mem/pmm.h"
 
 // todo: need lock to protect
 static proc_t proc_table[MAX_PROC];

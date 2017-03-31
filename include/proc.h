@@ -2,7 +2,7 @@
 #define PROC_H
 
 #include "types.h"
-#include "vmm.h"
+#include "mem/vmm.h"
 #include "idt.h"
 
 #define MAX_PROC 64

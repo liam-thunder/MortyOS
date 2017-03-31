@@ -1,7 +1,7 @@
-#include "vmm.h"
-#include "pmm.h"
-#include "string.h"
-#include "stdio.h"
+#include "mem/vmm.h"
+#include "mem/pmm.h"
+#include "common/string.h"
+#include "common/stdio.h"
 
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));

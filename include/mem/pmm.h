@@ -1,7 +1,7 @@
 #ifndef PMM_H
 #define PMM_H
 #include "multiboot.h"
-#include "stdio.h"
+#include "common/stdio.h"
 
 // size of process stack
 #define STACK_SIZE 8192

@@ -1,9 +1,9 @@
 #include "task.h"
-#include "string.h"
-#include "pmm.h"
-#include "heap.h"
+#include "common/string.h"
+#include "mem/pmm.h"
+#include "mem/heap.h"
 #include "sched.h"
-#include "stdio.h"
+#include "common/stdio.h"
 
 pid_t now_pid = 0;
 

@@ -2,9 +2,9 @@
 #define CONSOLE_H
 
 #include "types.h"
-#include "stdarg.h"
-#include "string.h"
-#include "common.h"
+#include "common/stdarg.h"
+#include "common/string.h"
+#include "common/common.h"
 
 typedef enum color {
 	black = 0, blue = 1, green = 2, cyan = 3,

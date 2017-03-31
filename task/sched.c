@@ -1,6 +1,6 @@
 #include "sched.h"
-#include "heap.h"
-#include "pmm.h"
+#include "mem/heap.h"
+#include "mem/pmm.h"
 
 
 task_struct_t *running_proc_head = NULL;

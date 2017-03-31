@@ -1,4 +1,4 @@
-#include "pmm.h"
+#include "mem/pmm.h"
 
 static uint32_t pmm_stack[PMM_PAGE_MAX_NUM + 1];
 

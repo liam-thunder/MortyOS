@@ -1,6 +1,6 @@
-#include "heap.h"
-#include "pmm.h"
-#include "vmm.h"
+#include "mem/heap.h"
+#include "mem/pmm.h"
+#include "mem/vmm.h"
 
 static header_t* heap_head;
 

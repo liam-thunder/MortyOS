@@ -2,7 +2,7 @@
 #define IDT_H
 
 #include "types.h"
-#include "common.h"
+#include "common/common.h"
 
 // kernel data segment selector (IDX(2) TI(0) PRL(0))
 #define SEL_KDATA 0x8
