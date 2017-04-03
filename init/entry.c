@@ -1,7 +1,7 @@
 #include "common/stdio.h"
 #include "mem/gdt.h"
 #include "idt.h"
-#include "timer.h"
+#include "driver/string.h"
 #include "mem/pmm.h"
 #include "common/string.h"
 #include "mem/vmm.h"

@@ -22,24 +22,32 @@ void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type) {
 }
 
 void remap_pic() {
-    outb(0x20, 0x11);
-    outb(0xA0, 0x11);
 
-    // Master starts from 32 Interrupt
-    outb(0x21, 0x20);
+    // set up master pic
+    // give init command
+    outb(PIC1, 0x11);
+    // master starts from 32(0x20) Interrupt
+    outb(PIC1 + 1, IRQ0);
+    // tell master that there is a slave at IRQ2 (0000 0100)
+    outb(PIC1 + 1, 0x04);
+    // set to 8086 mode
+    outb(PIC1 + 1, 0x01);
+    // set mask
+    outb(PIC1 + 1, 0x0);
 
-    // Salve starts from 40 Interrupt
-    outb(0xA1, 0x28);
-
-    outb(0x21, 0x04);
-    outb(0xA1, 0x02);
-
-    outb(0x21, 0x01);
-    outb(0xA1, 0x01);
-
-    outb(0x21, 0x0);
-    outb(0xA1, 0x0);
+    // set up slave pic
+    // give init command
+    outb(PIC2, 0x11);
+    // salve starts from 40(0x28) Interrupt
+    outb(PIC2 + 1, IRQ8);
+    // tell slave its cascade identity (0000 0010)
+    outb(PIC2 + 1, 0x02);
+    // set to 8086 mode
+    outb(PIC2 + 1, 0x01);
+    // set mask 
+    outb(PIC2 + 1, 0x0);
 }
+
 extern void idt_flush(uint32_t);
 
 void init_idt() {

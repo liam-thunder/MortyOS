@@ -3,7 +3,6 @@
 #include "types.h"
 #include "idt.h"
 
-
 // Page Global Directory
 typedef uint32_t pgd_t;
 
@@ -22,11 +21,11 @@ typedef uint32_t pte_t;
 #define PAGE_SIZE 4096
 
 // get higher 10 bits of an linear address
-// which is the page table address
+// which is the physical addr of page table 
 #define PGD_INDEX(x) (((x) >> 22) & 0x3FF)
 
 // get middle 10 bits of an linear address
-// which is the physical page address
+// which is the physical addr of physical mem frame
 #define PTE_INDEX(x) (((x) >> 12) & 0x3FF)
 
 // get lower 12 bits of and linear address

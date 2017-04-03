@@ -18,34 +18,6 @@
 // Present and Storage Segment
 #define P_USED 0x80
 
-// Ref http://wiki.osdev.org/Interrupt_Descriptor_Table
-// be careful with the sequence of fileds
-typedef struct idt_entry {
-    uint16_t offset_low;   // lower 16bits offset
-    uint16_t seg_sel;      // segment selector
-    uint8_t zero_part;     // reserved zero
-    uint8_t type_attr;     // type and attributes     
-    uint16_t offset_high;  // higher 16bits offset
-} __attribute__((packed)) idt_entry_t;
-
-
-typedef struct idt_ptr_t {
-    uint16_t limit;
-    uint32_t base;
-} __attribute__((packed)) idt_ptr_t;
-
-typedef struct registers {
-    // segment selector
-    uint32_t gs, fs, es, ds;
-    // pusha regs
-    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-    // Interrupt number and error code
-    uint32_t int_number, error_code;
-    // Pushed by the processor automatically
-    uint32_t eip, cs, eflags, useresp, ss; 
-} registers_t;
-
-
 #define  ISR0      0
 #define  ISR1      1
 #define  ISR2      2
@@ -97,6 +69,39 @@ typedef struct registers {
 #define  IRQ15    47
 
 #define T_SYSCALL 64
+
+
+// PIC Command
+#define PIC1  0x20   // IO base address for master PIC 
+#define PIC2  0xA0   // IO base address for slave PIC
+
+
+// Ref http://wiki.osdev.org/Interrupt_Descriptor_Table
+// be careful with the sequence of fileds
+typedef struct idt_entry {
+    uint16_t offset_low;   // lower 16bits offset
+    uint16_t seg_sel;      // segment selector
+    uint8_t zero_part;     // reserved zero
+    uint8_t type_attr;     // type and attributes     
+    uint16_t offset_high;  // higher 16bits offset
+} __attribute__((packed)) idt_entry_t;
+
+
+typedef struct idt_ptr_t {
+    uint16_t limit;
+    uint32_t base;
+} __attribute__((packed)) idt_ptr_t;
+
+typedef struct registers {
+    // segment selector
+    uint32_t gs, fs, es, ds;
+    // pusha regs
+    uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+    // Interrupt number and error code
+    uint32_t int_number, error_code;
+    // Pushed by the processor automatically
+    uint32_t eip, cs, eflags, useresp, ss; 
+} registers_t;
 
 void init_idt();
 

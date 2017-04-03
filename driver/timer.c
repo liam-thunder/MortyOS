@@ -1,4 +1,4 @@
-#include "timer.h"
+#include "driver/string.h"
 #include "common/stdio.h"
 #include "idt.h"
 #include "sched.h"
