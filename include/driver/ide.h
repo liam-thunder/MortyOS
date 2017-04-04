@@ -13,5 +13,5 @@
 
 #define IO_BASE 0x1F0
 
-void ide_init();
+void init_ide();
 #endif

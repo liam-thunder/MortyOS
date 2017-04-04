@@ -1,7 +1,6 @@
 #include "common/stdio.h"
 #include "mem/gdt.h"
 #include "idt.h"
-#include "driver/string.h"
 #include "mem/pmm.h"
 #include "common/string.h"
 #include "mem/vmm.h"
@@ -11,6 +10,7 @@
 //#include "task.h"
 //#include "sched.h"
 #include "proc.h"
+#include "driver/ide.h"
 
 int kern_init();
 
@@ -177,9 +177,11 @@ int kern_init() {
     pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
     clone_pgd(new_pgd_vaddr, pgd_kern);*/
     enable_interrupt();
+    /*
     asm volatile ("int $0x3");
     asm volatile ("int $0x4");
-    initTimer(200);
+    initTimer(200);*/
+    init_ide();
     //test_process();
     //proc_init();
     while (1) {

@@ -51,7 +51,7 @@ typedef uint32_t pte_t;
 /**
  * num of page table
  * since we manage the 512MB of memory at most
- * so there will be at most 512MB / 4986K = 128 page tables
+ * so there will be at most 512MB / 4096K = 128 page tables
  */ 
 #define PTE_COUNT 128
 
