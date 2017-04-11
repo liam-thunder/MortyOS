@@ -13,5 +13,7 @@
 
 #define IO_BASE 0x1F0
 
+#include "types.h"
+
 void init_ide();
 #endif

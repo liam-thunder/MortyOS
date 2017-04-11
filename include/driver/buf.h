@@ -19,7 +19,7 @@ struct buf {
     struct buf* next;
     struct buf* qnext; 
     uint8_t data[B_SIZE];
-}
+};
 
 
 #endif

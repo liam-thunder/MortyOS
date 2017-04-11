@@ -11,6 +11,7 @@
 //#include "sched.h"
 #include "proc.h"
 #include "driver/ide.h"
+#include "debug.h"
 
 int kern_init();
 
@@ -156,7 +157,9 @@ void test_process() {
         }
     }
 }*/
-
+void test_debug() {
+    panic("Shoot");
+}
 
 int kern_init() {
 
@@ -170,6 +173,7 @@ int kern_init() {
     initPMM();
     //test_phy_mem_alloc();
     init_vmm();  
+    init_debug();
     //test_heap();
     //test_initrd_filesystem();
 
@@ -182,6 +186,7 @@ int kern_init() {
     asm volatile ("int $0x4");
     initTimer(200);*/
     init_ide();
+    test_debug();
     //test_process();
     //proc_init();
     while (1) {
