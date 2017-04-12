@@ -25,7 +25,7 @@ extern uint32_t kern_stack_top;
 
 void showMemMap();
 
-void initPMM();
+void init_pmm();
 
 uint32_t pmm_alloc_page();
 

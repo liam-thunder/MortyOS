@@ -68,7 +68,7 @@
 #define  IRQ14    46
 #define  IRQ15    47
 
-#define T_SYSCALL 64
+#define T_SYSCALL 128
 
 
 // PIC Command
@@ -160,8 +160,6 @@ void isr30();
 void isr31();
 
 // 32 - 255 User Defined Interrupts
-//void isr255();
-void isr128();
 
 void irq0();     // Programmable Interrupt Timer Interrupt
 void irq1();     // Keyboard Interrupt
@@ -179,5 +177,8 @@ void irq12();    // PS2 Mouse
 void irq13();    // FPU / Coprocessor / Inter-processor
 void irq14();    // Primary ATA Hard Disk
 void irq15();    // Secondary ATA Hard Disk
+
+// 128(0x80) for systemcall
+void systemcall();
 
 #endif

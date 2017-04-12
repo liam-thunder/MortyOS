@@ -7,10 +7,9 @@
 #include "mem/heap.h"
 #include "initrd.h"
 #include "vfs.h"
-//#include "task.h"
-//#include "sched.h"
 #include "proc.h"
 #include "driver/ide.h"
+#include "driver/timer.h"
 #include "debug.h"
 
 int kern_init();
@@ -130,36 +129,6 @@ void test_initrd_filesystem() {
         i++;
     }
 }
-/*
-int flag = 0;
-int worker() {
-    int test_var = 1024;
-    while(1) {
-        if(flag == 1) {
-            printf("New Stack: 0x%08X\n", &test_var);
-            flag = 0;
-        }
-    }
-    return 0;
-}
-
-void test_process() {
-    enable_interrupt();
-    initTimer(200);
-    init_schedule();
-    kernel_thread(worker, NULL);
-
-    while(1) {
-        int test_var = 2048;
-        if(flag == 0) {
-            printf("Old Stack: 0x%08X\n", &test_var);
-            flag = 1;
-        }
-    }
-}*/
-void test_debug() {
-    panic("Shoot");
-}
 
 int kern_init() {
 
@@ -170,23 +139,19 @@ int kern_init() {
     init_idt();
 
 
-    initPMM();
+    init_pmm();
     //test_phy_mem_alloc();
     init_vmm();  
-    init_debug();
+    //init_debug();
     //test_heap();
     //test_initrd_filesystem();
 
-    /*pgd_t* new_pgd = (pgd_t*) pmm_alloc_page();
-    pgd_t* new_pgd_vaddr = (pgd_t*)((uint32_t)new_pgd + PAGE_OFFSET);
-    clone_pgd(new_pgd_vaddr, pgd_kern);*/
     enable_interrupt();
-    /*
-    asm volatile ("int $0x3");
-    asm volatile ("int $0x4");
-    initTimer(200);*/
-    init_ide();
-    test_debug();
+    
+    //asm volatile ("int $0x3");
+    //asm volatile ("int $0x4");
+    //initTimer(200);
+    //init_ide();
     //test_process();
     //proc_init();
     while (1) {

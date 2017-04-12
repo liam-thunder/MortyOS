@@ -92,10 +92,10 @@ void init_idt() {
     idt_setgate(ISR29, (uint32_t)isr29, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(ISR30, (uint32_t)isr30, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(ISR31, (uint32_t)isr31, SEL_KDATA, P_USED | GATE_INT_32);
-
+    
     // 32 - 47 IRQ
     idt_setgate(IRQ0, (uint32_t)irq0, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ1, (uint32_t)irq1, SEL_KDATA, P_USED | GATE_INT_32);
+    /*idt_setgate(IRQ1, (uint32_t)irq1, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ2, (uint32_t)irq2, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ3, (uint32_t)irq3, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ4, (uint32_t)irq4, SEL_KDATA, P_USED | GATE_INT_32);
@@ -109,7 +109,10 @@ void init_idt() {
     idt_setgate(IRQ12, (uint32_t)irq12, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ13, (uint32_t)irq13, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ14, (uint32_t)irq14, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KDATA, P_USED | GATE_INT_32);
+    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KDATA, P_USED | GATE_INT_32);*/
+
+    // 128(0x80) System Call
+    //idt_setgate(T_SYSCALL, (uint32_t)systemcall, SEL_KDATA, P_USED | GATE_TRAP_32);
 
     idt_flush((uint32_t)&idt_ptr);
 }
@@ -118,7 +121,7 @@ void isr_handler(registers_t *regs) {
     if(inter_handlers[regs->int_number]) 
         inter_handlers[regs->int_number](regs);
     else 
-        printf("Unhandled interrupt: %d\n", regs->int_number);
+        printf("Unhandled isr: %d\n", regs->int_number);
 }
 
 void irq_handler(registers_t *regs) {
@@ -131,8 +134,12 @@ void irq_handler(registers_t *regs) {
 
 void trap_handler(registers_t *regs) {
     // TODO: add system call handler
-    if(regs->int_number <= 31) isr_handler(regs);
-    else irq_handler(regs);
+    if(regs->int_number >= 0 && regs->int_number <= 31) isr_handler(regs);
+    else if(regs->int_number > 31 && regs->int_number <= 47) irq_handler(regs);
+    else if(regs->int_number == 128) {
+        printf("shoot");
+    }
+    else return;
 }
 
 void reg_inter_handler(uint8_t n, interrupt_handler_t h) {

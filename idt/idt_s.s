@@ -86,6 +86,14 @@ IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
 
+
+;[GLOBAL systemcall]
+;systemcall:
+;    cli 
+;    push byte 0
+;    push byte 0x80
+;    jmp common_stub
+
 [GLOBAL common_stub]
 [EXTERN trap_handler]
 common_stub:
@@ -110,8 +118,6 @@ common_stub:
     jmp common_ret
  .end:
 
-;[GLOBAL isr_common_stub]
-;[EXTERN isrHandler]
 
  [GLOBAL common_ret]
 common_ret:

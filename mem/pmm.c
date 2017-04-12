@@ -1,4 +1,5 @@
 #include "mem/pmm.h"
+#include "debug.h"
 
 static uint32_t pmm_stack[PMM_PAGE_MAX_NUM + 1];
 
@@ -20,7 +21,7 @@ void showMemMap() {
                 (uint32_t)mmap->type);
 }
 
-void initPMM() {
+void init_pmm() {
     phy_page_cnt = 0;
     pmm_stack_top = 0;
     mmap_entry_t* start_addr = (mmap_entry_t*) glb_mboot_ptr->mmap_addr;
@@ -46,12 +47,18 @@ void initPMM() {
 }
 
 uint32_t pmm_alloc_page() {
-    if(pmm_stack_top == 0) return 0;
+    if(pmm_stack_top == 0) {
+        panic("run out of physical memory");
+        return 0;
+    }
     uint32_t page = pmm_stack[pmm_stack_top--];
     return page;
 }
 
 void pmm_free_page(uint32_t p) {
-    if(pmm_stack_top == PMM_PAGE_MAX_NUM) return;
+    if(pmm_stack_top == PMM_PAGE_MAX_NUM) {
+        panic("no memory to be freed");
+        return;
+    }
     pmm_stack[++pmm_stack_top] = p;
 }

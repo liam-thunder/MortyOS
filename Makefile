@@ -39,6 +39,7 @@ update_image:
 	sudo mount /dev/mapper/loop0p1 /mnt/kernel
 	sudo cp MortyOSKernel /mnt/kernel/boot
 	sudo cp scripts/grub.cfg /mnt/kernel/boot/grub
+	sudo cp initrd /mnt/kernel/boot
 	sleep 1
 	sudo umount /mnt/kernel
 	sudo sleep 1

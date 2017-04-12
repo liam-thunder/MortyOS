@@ -23,5 +23,6 @@ static int32_t ide_wait(int32_t is_err_check) {
 }
 
 static int32_t ide_start_request(struct buf* b) {
+    // TODO...
     return 0;
 }

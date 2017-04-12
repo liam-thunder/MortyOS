@@ -2,6 +2,7 @@
 #include "mem/pmm.h"
 #include "common/string.h"
 #include "common/stdio.h"
+#include "debug.h"
 
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
@@ -136,6 +137,23 @@ void clone_pgd(pgd_t* pgd_dst, pgd_t* pgd_src) {
             pte_dst_vir[j] = pte_src_vir[j];
     }
 }
+
+void create_init_uvm(pgd_t* pgd, char* init_code, uint32_t size) {
+    if(size > PAGE_SIZE) 
+        panic("init code too large for a page");
+
+    char* mem = (char*) pmm_alloc_page();
+
+    // init the space and copy init_code into this page
+    memset(mem, 0, PAGE_SIZE);
+    memcpy(mem, init_code, size);
+    
+    // map 
+    // TODO...
+}
+
+
+
 
 static void enable_paging() {
     uint32_t cr0;

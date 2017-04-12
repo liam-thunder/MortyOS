@@ -42,9 +42,9 @@ const char* elf_lookup_symbol(uint32_t addr, elf_t* elf) {
 }
 
 void panic(const char* msg) {
-    printf("---System Panic: %s---\n", msg);
+    printf("!--System Panic: %s\n", msg);
     print_stack_trace();
-    printf("-----------\n");
+    printf("!--\n");
     while (1) {
         asm volatile ("hlt");
     }
@@ -57,9 +57,10 @@ void init_debug() {
 static void print_stack_trace() {
     uint32_t *ebp, *eip;
     asm volatile ("mov %%ebp, %0" : "=r" (ebp));
+    // get function name from call stack
     while (ebp) {
         eip = ebp + 1;
-        printf("   [0x%x] %s\n", *eip, elf_lookup_symbol(*eip, &kernel_elf));
+        printf(" [0x%x] %s\n", *eip, elf_lookup_symbol(*eip, &kernel_elf));
         ebp = (uint32_t*)*ebp;
     }
 }
