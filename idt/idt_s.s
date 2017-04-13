@@ -12,8 +12,8 @@ idt_flush:
 [GLOBAL isr%1]
 isr%1:
     cli
-    push byte 0
-    push byte %1
+    push 0
+    push %1
     jmp common_stub
 %endmacro
 
@@ -21,7 +21,7 @@ isr%1:
 [GLOBAL isr%1]
 isr%1:
     cli
-    push byte %1
+    push %1
     jmp common_stub
 %endmacro
 
@@ -64,8 +64,8 @@ ISR_NOERRCODE 31
 [GLOBAL irq%1]
 irq%1:
     cli
-    push byte 0
-    push byte %2
+    push 0
+    push %2
     jmp common_stub
 %endmacro
 
@@ -86,13 +86,13 @@ IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
 
-
-;[GLOBAL systemcall]
-;systemcall:
-;    cli 
-;    push byte 0
-;    push byte 0x80
-;    jmp common_stub
+; use push byte 0x80 will overflow
+[GLOBAL systemcall]
+systemcall:
+    cli 
+    push 0
+    push 0x80
+    jmp common_stub
 
 [GLOBAL common_stub]
 [EXTERN trap_handler]

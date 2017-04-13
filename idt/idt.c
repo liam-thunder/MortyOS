@@ -95,7 +95,7 @@ void init_idt() {
     
     // 32 - 47 IRQ
     idt_setgate(IRQ0, (uint32_t)irq0, SEL_KDATA, P_USED | GATE_INT_32);
-    /*idt_setgate(IRQ1, (uint32_t)irq1, SEL_KDATA, P_USED | GATE_INT_32);
+    idt_setgate(IRQ1, (uint32_t)irq1, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ2, (uint32_t)irq2, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ3, (uint32_t)irq3, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ4, (uint32_t)irq4, SEL_KDATA, P_USED | GATE_INT_32);
@@ -109,10 +109,13 @@ void init_idt() {
     idt_setgate(IRQ12, (uint32_t)irq12, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ13, (uint32_t)irq13, SEL_KDATA, P_USED | GATE_INT_32);
     idt_setgate(IRQ14, (uint32_t)irq14, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KDATA, P_USED | GATE_INT_32);*/
+    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KDATA, P_USED | GATE_INT_32);
 
-    // 128(0x80) System Call
-    //idt_setgate(T_SYSCALL, (uint32_t)systemcall, SEL_KDATA, P_USED | GATE_TRAP_32);
+    /**
+     *  0x80(128) for System Call, Trap gates don’t clear the IF flag, 
+     *  allowing other interrupts during the system call handler.
+     */
+    idt_setgate(T_SYSCALL, (uint32_t)systemcall, SEL_KDATA, P_USED | GATE_TRAP_32 | DPL_U);
 
     idt_flush((uint32_t)&idt_ptr);
 }
@@ -130,15 +133,16 @@ void irq_handler(registers_t *regs) {
     outb(0x20, 0x20);
     if(inter_handlers[regs->int_number])
         inter_handlers[regs->int_number](regs);
+    else 
+        printf("Unhandled irq: %d\n", regs->int_number);
 }
 
 void trap_handler(registers_t *regs) {
     // TODO: add system call handler
     if(regs->int_number >= 0 && regs->int_number <= 31) isr_handler(regs);
-    else if(regs->int_number > 31 && regs->int_number <= 47) irq_handler(regs);
-    else if(regs->int_number == 128) {
-        printf("shoot");
-    }
+    //else if(regs->int_number > 31 && regs->int_number <= 47) irq_handler(regs);
+    else if((regs->int_number > 31 && regs->int_number <= 47) || regs->int_number == 0x80) 
+        irq_handler(regs);
     else return;
 }
 

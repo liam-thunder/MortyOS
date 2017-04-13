@@ -60,7 +60,7 @@ typedef uint32_t pte_t;
 
 void init_vmm();
 
-void pageFault(registers_t *regs);
+void page_fault(registers_t *regs);
 
 // map and unmap physical addr to virtual addr
 void map(pgd_t* pgd, uint32_t v_addr, uint32_t p_addr, uint32_t flags);

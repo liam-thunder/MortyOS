@@ -6,7 +6,7 @@
 
 void timerCallback(registers_t *regs) {
     static uint32_t tick = 0;
-    printf("Tick: %d\n", tick++);
+    //printf("Tick: %d\n", tick++);
     //schedule();
 }
 

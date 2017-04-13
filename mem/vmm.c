@@ -32,7 +32,7 @@ void init_vmm() {
     }
     uint32_t pgd_kern_phy_addr = (uint32_t)pgd_kern - PAGE_OFFSET;
     // reg page fault interrupt
-    reg_inter_handler(14, &pageFault);
+    reg_inter_handler(14, &page_fault);
 
     // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
     // otherwise switch will cause bug
@@ -41,7 +41,7 @@ void init_vmm() {
 
 }
 
-void pageFault(registers_t *regs) {
+void page_fault(registers_t *regs) {
     uint32_t cr2;
     asm volatile("mov %%cr2, %0" : "=r" (cr2));
 

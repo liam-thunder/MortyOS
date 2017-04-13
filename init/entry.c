@@ -7,7 +7,7 @@
 #include "mem/heap.h"
 #include "initrd.h"
 #include "vfs.h"
-#include "proc.h"
+#include "proc/proc.h"
 #include "driver/ide.h"
 #include "driver/timer.h"
 #include "debug.h"
@@ -148,9 +148,10 @@ int kern_init() {
 
     enable_interrupt();
     
-    //asm volatile ("int $0x3");
+
+    initTimer(200);
+    //asm volatile ("int $0x80");
     //asm volatile ("int $0x4");
-    //initTimer(200);
     //init_ide();
     //test_process();
     //proc_init();

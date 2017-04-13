@@ -13,7 +13,7 @@
 #define GATE_TASK_32 0x5  // 32 bits Task Gate
 
 // Descriptor Privilege Level
-#define DPL_U 0x70
+#define DPL_U 0x60
 
 // Present and Storage Segment
 #define P_USED 0x80
@@ -68,7 +68,7 @@
 #define  IRQ14    46
 #define  IRQ15    47
 
-#define T_SYSCALL 128
+#define T_SYSCALL 0x80
 
 
 // PIC Command
@@ -178,7 +178,6 @@ void irq13();    // FPU / Coprocessor / Inter-processor
 void irq14();    // Primary ATA Hard Disk
 void irq15();    // Secondary ATA Hard Disk
 
-// 128(0x80) for systemcall
+// 70(0x46) for systemcall
 void systemcall();
-
 #endif
