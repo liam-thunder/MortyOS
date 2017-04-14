@@ -17,7 +17,8 @@ int kern_init();
 multiboot_t* glb_mboot_ptr;
 
 char kern_stack[STACK_SIZE];
-uint32_t kern_stack_top;
+uintptr_t kern_stack_ptr;
+uintptr_t kern_stack_top;
 
 // Ref: http://wiki.osdev.org/Higher_Half_Kernel
 // 0x00000000 - 0xBFFFFFFF for user
@@ -53,8 +54,9 @@ __attribute__((section(".init.text"))) void kernEntry(uint32_t stack_addr) {
     cr0 |= 0x80000000;
     asm volatile ("mov %0, %%cr0" : : "r" (cr0));
 
+    kern_stack_ptr = ((uintptr_t)kern_stack) & 0xFFFFFFF0;
     // set stack top
-    kern_stack_top = ((uint32_t)kern_stack + STACK_SIZE) & 0xFFFFFFF0;
+    kern_stack_top = ((uintptr_t)kern_stack + STACK_SIZE) & 0xFFFFFFF0;
     asm volatile ("mov %0, %%esp\n\t"
             "xor %%ebp, %%ebp" : : "r" (kern_stack_top));
     
@@ -150,7 +152,7 @@ int kern_init() {
     
 
     initTimer(200);
-    //asm volatile ("int $0x80");
+    asm volatile ("int $0x80");
     //asm volatile ("int $0x4");
     //init_ide();
     //test_process();

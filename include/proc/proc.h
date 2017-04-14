@@ -4,13 +4,12 @@
 #include "types.h"
 #include "mem/vmm.h"
 #include "common/string.h"
-#include "idt.h"
 
 #define PROC_NAME_LEN 15
-#define MAX_PROC 128
+#define MAX_PROC 64
 #define MAX_PID (MAX_PROC * 2)
 
-//extern struct proc *idle_proc, *init_proc, *cur_proc;
+extern struct proc *idle_proc, *cur_proc;
 
 enum proc_state {
     P_UNUSED = 0, 
@@ -35,6 +34,7 @@ struct context {
 struct proc {
     int32_t pid;                        // process id
     enum proc_state state;              // process state
+    volatile int32_t need_resched;      // need reschedule or not?
     int32_t run_time;                   // running time ot this process
     uintptr_t kstack;                   // pointer to kernstack
     struct proc *parent;                // the parent process
@@ -48,5 +48,9 @@ struct proc {
 };
 
 void init_proc();
+
+void set_proc_name(struct proc* p, const char* name);
+
+int32_t init_kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flag);
 
 #endif

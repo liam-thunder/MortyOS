@@ -1,6 +1,7 @@
 #include "common/string.h"
 #include "idt.h"
 #include "common/stdio.h"
+#include "mem/gdt.h"
 
 #define IDT_LEN 256
 
@@ -11,14 +12,15 @@ idt_ptr_t idt_ptr;
 
 interrupt_handler_t inter_handlers[IDT_LEN];
 
-void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type) {
-	idt_entries[num].offset_low = base & 0xFFFF;
-	idt_entries[num].offset_high = (base >> 16) & 0xFFFF;
 
-	idt_entries[num].seg_sel = sel;
-	idt_entries[num].zero_part = 0;
+void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t gate_type, uint8_t DPL) {
+    idt_entries[num].offset_low = base & 0xFFFF;
+    idt_entries[num].offset_high = (base >> 16) & 0xFFFF;
 
-    idt_entries[num].type_attr = type;
+    idt_entries[num].seg_sel = sel;
+    idt_entries[num].zero_part = 0;
+
+    idt_entries[num].type_attr = (P_USED | gate_type | (DPL << 5));
 }
 
 void remap_pic() {
@@ -60,62 +62,62 @@ void init_idt() {
 	memset(&idt_entries, 0, sizeof(idt_entry_t) * IDT_LEN);
 	
     // 0 - 31 CPU Reserved ISR
-	idt_setgate(ISR0, (uint32_t)isr0, SEL_KDATA, P_USED | GATE_INT_32);
-	idt_setgate(ISR1, (uint32_t)isr1, SEL_KDATA, P_USED | GATE_INT_32);
-	idt_setgate(ISR2, (uint32_t)isr2, SEL_KDATA, P_USED | GATE_INT_32);
-	idt_setgate(ISR3, (uint32_t)isr3, SEL_KDATA, P_USED | GATE_INT_32);
-	idt_setgate(ISR4, (uint32_t)isr4,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR5, (uint32_t)isr5,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR6, (uint32_t)isr6,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR7, (uint32_t)isr7,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR8, (uint32_t)isr8,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR9, (uint32_t)isr9,  SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR10, (uint32_t)isr10, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR11, (uint32_t)isr11, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR12, (uint32_t)isr12, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR13, (uint32_t)isr13, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR14, (uint32_t)isr14, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR15, (uint32_t)isr15, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR16, (uint32_t)isr16, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR17, (uint32_t)isr17, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR18, (uint32_t)isr18, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR19, (uint32_t)isr19, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR20, (uint32_t)isr20, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR21, (uint32_t)isr21, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR22, (uint32_t)isr22, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR23, (uint32_t)isr23, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR24, (uint32_t)isr24, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR25, (uint32_t)isr25, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR26, (uint32_t)isr26, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR27, (uint32_t)isr27, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR28, (uint32_t)isr28, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR29, (uint32_t)isr29, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR30, (uint32_t)isr30, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(ISR31, (uint32_t)isr31, SEL_KDATA, P_USED | GATE_INT_32);
+	idt_setgate(ISR0, (uint32_t)isr0, SEL_KCODE, GATE_INT_32, DPL_K);
+	idt_setgate(ISR1, (uint32_t)isr1, SEL_KCODE, GATE_INT_32, DPL_K);
+	idt_setgate(ISR2, (uint32_t)isr2, SEL_KCODE, GATE_INT_32, DPL_K);
+	idt_setgate(ISR3, (uint32_t)isr3, SEL_KCODE, GATE_INT_32, DPL_K);
+	idt_setgate(ISR4, (uint32_t)isr4,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR5, (uint32_t)isr5,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR6, (uint32_t)isr6,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR7, (uint32_t)isr7,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR8, (uint32_t)isr8,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR9, (uint32_t)isr9,  SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR10, (uint32_t)isr10, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR11, (uint32_t)isr11, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR12, (uint32_t)isr12, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR13, (uint32_t)isr13, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR14, (uint32_t)isr14, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR15, (uint32_t)isr15, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR16, (uint32_t)isr16, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR17, (uint32_t)isr17, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR18, (uint32_t)isr18, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR19, (uint32_t)isr19, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR20, (uint32_t)isr20, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR21, (uint32_t)isr21, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR22, (uint32_t)isr22, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR23, (uint32_t)isr23, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR24, (uint32_t)isr24, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR25, (uint32_t)isr25, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR26, (uint32_t)isr26, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR27, (uint32_t)isr27, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR28, (uint32_t)isr28, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR29, (uint32_t)isr29, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR30, (uint32_t)isr30, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(ISR31, (uint32_t)isr31, SEL_KCODE, GATE_INT_32, DPL_K);
     
     // 32 - 47 IRQ
-    idt_setgate(IRQ0, (uint32_t)irq0, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ1, (uint32_t)irq1, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ2, (uint32_t)irq2, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ3, (uint32_t)irq3, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ4, (uint32_t)irq4, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ5, (uint32_t)irq5, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ6, (uint32_t)irq6, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ7, (uint32_t)irq7, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ8, (uint32_t)irq8, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ9, (uint32_t)irq9, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ10, (uint32_t)irq10, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ11, (uint32_t)irq11, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ12, (uint32_t)irq12, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ13, (uint32_t)irq13, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ14, (uint32_t)irq14, SEL_KDATA, P_USED | GATE_INT_32);
-    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KDATA, P_USED | GATE_INT_32);
+    idt_setgate(IRQ0, (uint32_t)irq0, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ1, (uint32_t)irq1, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ2, (uint32_t)irq2, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ3, (uint32_t)irq3, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ4, (uint32_t)irq4, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ5, (uint32_t)irq5, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ6, (uint32_t)irq6, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ7, (uint32_t)irq7, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ8, (uint32_t)irq8, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ9, (uint32_t)irq9, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ10, (uint32_t)irq10, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ11, (uint32_t)irq11, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ12, (uint32_t)irq12, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ13, (uint32_t)irq13, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ14, (uint32_t)irq14, SEL_KCODE, GATE_INT_32, DPL_K);
+    idt_setgate(IRQ15, (uint32_t)irq15, SEL_KCODE, GATE_INT_32, DPL_K);
 
     /**
      *  0x80(128) for System Call, Trap gates don’t clear the IF flag, 
      *  allowing other interrupts during the system call handler.
      */
-    idt_setgate(T_SYSCALL, (uint32_t)systemcall, SEL_KDATA, P_USED | GATE_TRAP_32 | DPL_U);
+    idt_setgate(T_SYSCALL, (uint32_t)systemcall, SEL_KCODE, GATE_TRAP_32, DPL_U);
 
     idt_flush((uint32_t)&idt_ptr);
 }

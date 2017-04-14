@@ -4,8 +4,7 @@
 #include "types.h"
 #include "common/common.h"
 
-// kernel data segment selector (IDX(2) TI(0) PRL(0))
-#define SEL_KDATA 0x8
+//#define SEL_KCODE 0x8
 
 // Gate Type
 #define GATE_INT_32 0xE   // 32 bits Interrupt Gate
@@ -13,7 +12,7 @@
 #define GATE_TASK_32 0x5  // 32 bits Task Gate
 
 // Descriptor Privilege Level
-#define DPL_U 0x60
+//#define DPL_U 0x60
 
 // Present and Storage Segment
 #define P_USED 0x80
@@ -107,7 +106,9 @@ void init_idt();
 
 void remap_pic();
 
-void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type);
+//void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t type);
+void idt_setgate(uint8_t num, uint32_t base, uint16_t sel, uint8_t gate_type, uint8_t DPL);
+
 
 // interrupt handler function pointer
 typedef void (*interrupt_handler_t)(registers_t *);

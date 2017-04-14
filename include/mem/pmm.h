@@ -21,7 +21,8 @@ extern uint8_t kern_end[];
 
 extern uint32_t phy_page_cnt;
 
-extern uint32_t kern_stack_top;
+extern uintptr_t kern_stack_top;
+extern uintptr_t kern_stack_ptr;
 
 void showMemMap();
 
