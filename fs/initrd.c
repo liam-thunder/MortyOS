@@ -1,6 +1,6 @@
 #include "initrd.h"
 #include "mem/heap.h"
-#include "common/string.h"
+#include "libs/string.h"
 
 fs_node_t *initrd_root;
 fs_node_t *initrd_dev;

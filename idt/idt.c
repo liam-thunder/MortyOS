@@ -1,6 +1,6 @@
-#include "common/string.h"
+#include "libs/string.h"
 #include "idt.h"
-#include "common/stdio.h"
+#include "libs/stdio.h"
 #include "mem/gdt.h"
 
 #define IDT_LEN 256

@@ -1,4 +1,4 @@
-#include "common/stdio.h"
+#include "libs/stdio.h"
 #include "mem/vmm.h"
 static uint16_t *videoMemory = (uint16_t *)(0xB8000 + PAGE_OFFSET);
 

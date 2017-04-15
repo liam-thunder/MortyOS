@@ -1,5 +1,5 @@
 #include "driver/ide.h"
-#include "common/common.h"
+#include "libs/common.h"
 #include "driver/buf.h"
 
 static int32_t ide_wait(int32_t is_err_check);

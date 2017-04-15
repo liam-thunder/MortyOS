@@ -73,6 +73,7 @@ void showHeapDbg() {
 void* kmalloc_align(uint32_t len, uint32_t alignment, uintptr_t* orig_ptr) {
     uint32_t mask = alignment - 1;
     uintptr_t mem = (uintptr_t)kmalloc(len + alignment);
+    if(mem == NULL) return NULL;
     *orig_ptr = mem;
     return (void *)((mem + mask) & ~mask);
 }

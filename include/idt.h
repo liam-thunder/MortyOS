@@ -2,7 +2,7 @@
 #define IDT_H
 
 #include "types.h"
-#include "common/common.h"
+#include "libs/common.h"
 
 //#define SEL_KCODE 0x8
 

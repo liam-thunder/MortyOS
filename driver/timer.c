@@ -1,7 +1,7 @@
-#include "common/string.h"
-#include "common/stdio.h"
+#include "libs/string.h"
+#include "libs/stdio.h"
 #include "idt.h"
-#include "common/common.h"
+#include "libs/common.h"
 
 
 void timerCallback(registers_t *regs) {

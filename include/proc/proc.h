@@ -3,13 +3,16 @@
 
 #include "types.h"
 #include "mem/vmm.h"
-#include "common/string.h"
+#include "libs/string.h"
+#include "libs/list.h"
 
 #define PROC_NAME_LEN 15
 #define MAX_PROC 64
 #define MAX_PID (MAX_PROC * 2)
 
 extern struct proc *idle_proc, *cur_proc;
+
+extern list_node_t proc_list;
 
 enum proc_state {
     P_UNUSED = 0, 
@@ -52,5 +55,11 @@ void init_proc();
 void set_proc_name(struct proc* p, const char* name);
 
 int32_t init_kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flag);
+
+void kernel_thread_entry();
+
+int32_t do_exit(int32_t error);
+int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg);
+
 
 #endif

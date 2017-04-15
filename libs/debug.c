@@ -1,6 +1,6 @@
 #include "elf.h"
-#include "common/string.h"
-#include "common/stdio.h"
+#include "libs/string.h"
+#include "libs/stdio.h"
 #include "debug.h"
 #include "mem/vmm.h"
 

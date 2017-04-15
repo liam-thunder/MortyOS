@@ -1,7 +1,7 @@
 #include "mem/vmm.h"
 #include "mem/pmm.h"
-#include "common/string.h"
-#include "common/stdio.h"
+#include "libs/string.h"
+#include "libs/stdio.h"
 #include "debug.h"
 
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE

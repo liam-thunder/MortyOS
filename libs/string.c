@@ -1,4 +1,4 @@
-#include "common/string.h"
+#include "libs/string.h"
 
 void* memcpy(void *dest, const void * src, size_t num) {
     if (dest == NULL || src == NULL) return NULL;
