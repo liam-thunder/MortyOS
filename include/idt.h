@@ -123,6 +123,8 @@ void isr_handler(registers_t *regs);
 // Interrupt Requests handle function
 void irq_handler(registers_t *regs);
 
+void common_ret();
+
 // Interrupt service routine CPU Reserved
 // 0 - 19 Special, CPU-dedicated interrupts
 void isr0();        // 0 #DE Division by zero exception
@@ -181,4 +183,6 @@ void irq15();    // Secondary ATA Hard Disk
 
 // 70(0x46) for systemcall
 void systemcall();
+
+
 #endif

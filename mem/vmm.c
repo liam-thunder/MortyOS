@@ -152,9 +152,6 @@ void create_init_uvm(pgd_t* pgd, char* init_code, uint32_t size) {
     // TODO...
 }
 
-
-
-
 static void enable_paging() {
     uint32_t cr0;
     asm volatile ("mov %%cr0, %0" : "=r" (cr0));

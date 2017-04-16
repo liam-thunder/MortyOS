@@ -119,7 +119,7 @@ common_stub:
  .end:
 
 
- [GLOBAL common_ret]
+[GLOBAL common_ret]
 common_ret:
     ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
     pop gs

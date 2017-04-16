@@ -3,8 +3,8 @@
 #include "multiboot.h"
 #include "libs/stdio.h"
 
-// size of process stack
-#define STACK_SIZE 8192
+// size of process stack (4kb for simplification)
+#define STACK_SIZE 0x1000
 
 // max size of physical memory supported here(512MB)
 #define PMM_MAX_SIZE 0x20000000

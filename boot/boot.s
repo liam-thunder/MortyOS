@@ -24,16 +24,16 @@ dd MBOOT_CHECKSUM
 [EXTERN kernEntry]
 
 start:
-	cli
-	mov [mboot_ptr_tmp], ebx
-	mov esp, STACK_TOP
-	add esp, 0FFFFFFF0H
-	mov ebp, 0
-	;mov esp, STACK_TOP
-	;mov ebp, 0
-	;and esp, 0FFFFFFF0H
-	;mov [glb_mboot_ptr], ebx
-	call kernEntry
+    cli
+    mov [mboot_ptr_tmp], ebx
+    mov esp, STACK_TOP
+    add esp, 0FFFFFFF0H
+    mov ebp, 0
+    ;mov esp, STACK_TOP
+    ;mov ebp, 0
+    ;and esp, 0FFFFFFF0H
+    ;mov [glb_mboot_ptr], ebx
+    call kernEntry
 
 ;-----------------------
 section .init.data
@@ -45,14 +45,14 @@ mboot_ptr_tmp: dd 0
 
 
 ;stop:
-;	hlp
-;	jmp stop
+;   hlp
+;   jmp stop
 ;-----------------------
 ;section .bss
 ;stack:
-;	resb 32768
+;   resb 32768
 ;glb_mboot_ptr:
-;	resb 4
+;   resb 4
 ;STACK_TOP equ $-stack-1
 ;-----------------------
 

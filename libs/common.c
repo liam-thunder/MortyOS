@@ -20,3 +20,12 @@ inline uint16_t inw(uint16_t port) {
 inline void enable_interrupt() {
     asm volatile ("sti");
 }
+
+inline void disable_interrupt() {
+    asm volatile ("cli");
+}
+inline uint32_t read_eflags() {
+    uint32_t eflags;
+    __asm__ volatile ("pushfl; popl %0" : "=r" (eflags));
+    return eflags;
+}

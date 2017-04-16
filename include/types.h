@@ -2,12 +2,12 @@
 #define TYPES_H
 
 #ifndef NULL
-	#define NULL 0
+    #define NULL 0
 #endif 
 
 #ifndef TRUE
-	#define TRUE 1
-	#define FALSE 0
+    #define TRUE 1
+    #define FALSE 0
 #endif
 
 typedef unsigned int uint32_t;
@@ -25,5 +25,11 @@ typedef uint32_t uintptr_t;
 typedef uint32_t size_t; 
 
 typedef int32_t pid_t;
+
+// get the offset of 'member' relative to the beginning of its struct
+#define OFFSETOF(type, member)  ((size_t)(&((type *)0)->member))
+
+// get the struct from 'ptr'
+#define TO_STRUCT(ptr, type, member) ((type *)((char *)(ptr) - OFFSETOF(type, member)))
 
 #endif
