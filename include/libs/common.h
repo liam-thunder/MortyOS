@@ -25,4 +25,10 @@ void disable_interrupt();
 // read eflags
 uint32_t read_eflags();
 
+// save interrupt state and disable
+int32_t save_interrupt();
+
+// recover interrupt state
+void recover_interrupt(int32_t interrupt_state);
+
 #endif

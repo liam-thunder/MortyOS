@@ -13,6 +13,7 @@
 #define SEL_KDATA_IDX 2
 #define SEL_UCODE_IDX 3
 #define SEL_UDATA_IDX 4
+#define SEL_TSS_IDX 5
 
 // Requested Privilege Level 
 #define DPL_K (0)
@@ -42,6 +43,10 @@ typedef struct gdt_entry_t
     // high Base 24:31
     uint8_t base_high;
 } __attribute__((packed)) gdt_entry_t; 
+
+typedef struct tss_entry_t {
+
+} __attribute__((packed)) tss_entry_t;
 
 typedef struct gdt_ptr_t {
     uint16_t limit;

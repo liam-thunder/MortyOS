@@ -5,6 +5,7 @@
 #include "debug.h"
 #include "mem/gdt.h"
 #include "libs/common.h"
+#include "libs/stdio.h"
 
 // static function declaration
 
@@ -29,13 +30,13 @@ struct proc *start_proc = NULL;
 
 static uint32_t static_pid = 0;
 
-list_node_t proc_list;
+list_node_t proc_list_head;
 
 void init_proc() {
-    init_list_head(&proc_list);
+    init_list_head(&proc_list_head);
     idle_proc = NULL;
-    //memset(proc_table, 0, sizeof(struct proc) * MAX_PROC);
 
+    // allocate a idle process
     if((idle_proc = alloc_proc()) == NULL)
         panic("Alloc Process Fail");
 
@@ -56,6 +57,7 @@ void init_proc() {
 }
 
 int32_t init_kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flag) {
+    // setup register for process to trap into kernel
     registers_t reg;
     memset(&reg, 0, sizeof(registers_t));
     reg.cs = SEL_KCODE;
@@ -98,19 +100,13 @@ int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg) {
         return -1;
     }
 
-    // disable interrupt
-    int32_t interrupt_flag;
-    if(read_eflags() | FL_IF) {
-        disable_interrupt();
-        interrupt_flag = TRUE;
-    } else interrupt_flag = FALSE;
+    int32_t interrupt_state = save_interrupt();
 
     p->pid = get_pid();
-    list_add(&p->proc_node, &proc_list);
+    list_add(&p->proc_node, &proc_list_head);
     proc_num++;
 
-    if(interrupt_flag) enable_interrupt();
-
+    recover_interrupt(interrupt_state);
     // need to wake up the process
     // todo...
 
@@ -121,13 +117,29 @@ int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg) {
 
 struct proc* find_proc(int32_t pid) {
     if(pid < 0 || pid >= MAX_PID) return NULL;
-    for(list_node_t* n = list_next(&proc_list); n != &proc_list; n = list_next(n)) {
+    for(list_node_t* n = list_next(&proc_list_head); n != &proc_list_head; n = list_next(n)) {
         struct proc *p = NODE2PROC(n);
         if(p->pid == pid) return p;
     }
     return NULL;
 }
 
+void proc_run(struct proc* p) {
+    if(p == cur_proc) return;
+    struct proc* prev = cur_proc, *next = p;
+    int32_t interrupt_state = save_interrupt();
+
+    cur_proc = p;
+    // todo switch...
+
+}
+
+// static function imple
+
+/**
+ * alloc_proc is used to allocate a new process struct
+ * whose fields are initialized.
+ */
 struct proc* alloc_proc() {
     struct proc *p = kmalloc(sizeof(struct proc));
     if(!p) return p;
@@ -146,11 +158,18 @@ struct proc* alloc_proc() {
     return p;
 }
 
+/**
+ * setup pgd struct for process,
+ * needed when clone flag is set
+ */
 int32_t setup_mem(uint32_t clone_flag, struct proc *p) {
     // todo...
     return 0;
 }
 
+/**
+ * setup stack for new process, and initialize context
+ */
 int32_t setup_stack(struct proc *p, uintptr_t stack, registers_t *reg) {
     // set up stack
     uintptr_t alloc_stack = (uintptr_t) pmm_alloc_page();
@@ -190,6 +209,8 @@ int32_t get_pid() {
     return ret;
 }
 
+// function for kernel thread
 int32_t init_thread_fun(void* arg) {
+    printf("To U: %s\n", (const char *)arg);
     return -1;
 }

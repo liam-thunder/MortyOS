@@ -29,3 +29,17 @@ inline uint32_t read_eflags() {
     __asm__ volatile ("pushfl; popl %0" : "=r" (eflags));
     return eflags;
 }
+
+int32_t save_interrupt() {
+    int32_t interrupt_state;
+    if(read_eflags() | FL_IF) {
+        disable_interrupt();
+        interrupt_state = TRUE;
+    } else interrupt_state = FALSE;
+    return interrupt_state;
+}
+
+void recover_interrupt(int32_t interrupt_state) {
+    if(interrupt_state) 
+        enable_interrupt();
+}
