@@ -75,6 +75,7 @@ void set_proc_name(struct proc* p, const char* name) {
 }
 
 int32_t do_exit(int32_t error) {
+    panic("EXIT PROC");
     return -1;
 }
 
@@ -130,7 +131,8 @@ void proc_run(struct proc* p) {
     int32_t interrupt_state = save_interrupt();
 
     cur_proc = p;
-    // todo switch...
+    set_esp0(next->kstack + STACK_SIZE);
+    
 
 }
 

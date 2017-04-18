@@ -3,6 +3,7 @@
 #include "libs/string.h"
 #include "libs/stdio.h"
 #include "debug.h"
+#include "libs/common.h"
 
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
@@ -12,7 +13,6 @@ pgd_t* current_pgd;
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
 static void switch_pgd(uint32_t pgd_addr);
-static void enable_paging();
 static void tlb_flush(uint32_t v_addr);
 
 void init_vmm() {
@@ -151,17 +151,17 @@ void create_init_uvm(pgd_t* pgd, char* init_code, uint32_t size) {
     // map 
     // TODO...
 }
-
+/*
 static void enable_paging() {
     uint32_t cr0;
     asm volatile ("mov %%cr0, %0" : "=r" (cr0));
     cr0 |= 0x80000000;
     asm volatile ("mov %0, %%cr0" : : "r" (cr0));
 }
-
+*/
 static void switch_pgd(uint32_t pgd_addr) {
     current_pgd = (pgd_t*)pgd_addr;
-    asm volatile ("mov %0, %%cr3" : : "r" (pgd_addr));
+    set_cr3(pgd_addr);
 }
 
 static void tlb_flush(uint32_t v_addr) {

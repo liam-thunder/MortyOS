@@ -31,4 +31,14 @@ int32_t save_interrupt();
 // recover interrupt state
 void recover_interrupt(int32_t interrupt_state);
 
+uint32_t read_cr0();
+
+void set_cr0(uint32_t cr0);
+
+void enable_paging();
+
+uintptr_t read_cr3();
+
+void set_cr3(uintptr_t cr3);
+
 #endif

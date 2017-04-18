@@ -3,9 +3,9 @@
 
 #include "types.h"
 
-// code and data segment for kernel, code and data segment for user
-// and a null entry, so the size is five
-#define GDT_LEN 5
+// null entry, code and data segment for kernel, code and data segment for user
+// and a tss segment, so the size is six
+#define GDT_LEN 6
 
 // segment selector index
 #define SEL_NULL_IDX 0
@@ -45,7 +45,43 @@ typedef struct gdt_entry_t
 } __attribute__((packed)) gdt_entry_t; 
 
 typedef struct tss_entry_t {
-
+    uint32_t link;         // segment selector for the TSS of the previous task
+    uint32_t esp0;         // stack pointers and segment selectors
+    uint16_t ss0;          // after an increase in privilege level
+    uint16_t padding1;
+    uint32_t esp1;
+    uint16_t ss1;
+    uint16_t padding2;
+    uint32_t esp2;
+    uint16_t ss2;
+    uint16_t padding3;
+    uint32_t cr3;          // page directory base
+    uint32_t eip;          // saved state from last task switch
+    uint32_t eflags;
+    uint32_t eax;          // more saved state (registers)
+    uint32_t ecx;
+    uint32_t edx;
+    uint32_t ebx;
+    uint32_t esp;
+    uint32_t ebp;
+    uint32_t esi;
+    uint32_t edi;
+    uint16_t es;           // even more saved state (segment selectors)
+    uint16_t padding4;
+    uint16_t cs;
+    uint16_t padding5;
+    uint16_t ss;
+    uint16_t padding6;
+    uint16_t ds;
+    uint16_t padding7;
+    uint16_t fs;
+    uint16_t padding8;
+    uint16_t gs;
+    uint16_t padding9;
+    uint16_t ldt;
+    uint16_t padding10;
+    uint16_t t;              // trap on task switch
+    uint16_t io_map;         // i/o map base address
 } __attribute__((packed)) tss_entry_t;
 
 typedef struct gdt_ptr_t {
@@ -54,5 +90,7 @@ typedef struct gdt_ptr_t {
 } __attribute__((packed)) gdt_ptr_t;
 
 void init_gdt();
+
+void set_esp0(uintptr_t esp0);
 
 #endif

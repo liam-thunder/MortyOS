@@ -43,3 +43,29 @@ void recover_interrupt(int32_t interrupt_state) {
     if(interrupt_state) 
         enable_interrupt();
 }
+
+inline uint32_t read_cr0() {
+    uint32_t cr0;
+    asm volatile ("mov %%cr0, %0" : "=r" (cr0));
+    return cr0;
+}
+
+inline void set_cr0(uintptr_t cr0) {
+    asm volatile ("mov %0, %%cr0" : : "r" (cr0));
+}
+
+void enable_paging() {
+    uint32_t cr0 = read_cr0();
+    cr0 |= 0x80000000;
+    set_cr0(cr0);
+}
+
+inline uintptr_t read_cr3() {
+    uintptr_t cr3;
+    asm volatile ("mov %%cr3, %0" : "=r" (cr3));
+    return cr3;
+}
+
+inline void set_cr3(uintptr_t cr3) {
+    asm volatile ("mov %0, %%cr3" : : "r" (cr3));
+}
