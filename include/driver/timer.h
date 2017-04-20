@@ -3,6 +3,6 @@
 
 #include "types.h"
 
-void initTimer(uint32_t freq);
+void init_timer(uint32_t freq);
 
 # endif

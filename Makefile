@@ -71,4 +71,4 @@ debug:
 	#qemu -S -s -fda floppy.img -m 512 -boot a &
 	qemu -S -s -hda v_disk.img -m 512 -boot a &
 	sleep 1
-	cgdb -x scripts/gdbinit
+	gdb -x scripts/gdbinit

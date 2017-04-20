@@ -55,7 +55,7 @@ struct proc {
 // convert list node ptr to struct ptr
 #define NODE2PROC(ln) TO_STRUCT((ln), struct proc, proc_node)
 
-void proc_init();
+void init_proc();
 
 void set_proc_name(struct proc* p, const char* name);
 
@@ -65,6 +65,8 @@ int32_t init_kernel_thread(int (*fn)(void *), void *arg, uint32_t clone_flag);
 
 void kernel_thread_entry();
 
+void switch_to(struct context *from_ctx, struct context *to_ctx);
+
 int32_t do_exit(int32_t error);
 
 int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg);
@@ -72,5 +74,6 @@ int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg);
 struct proc* find_proc(int32_t pid);
 
 void proc_run(struct proc* p);
+
 
 #endif

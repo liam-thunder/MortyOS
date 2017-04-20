@@ -8,7 +8,7 @@
 // set the start addr of pgd_kern and pte_kern to allign with PAGE_SIZE
 pgd_t pgd_kern[PGD_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
-pgd_t* current_pgd;
+uintptr_t kernel_pgd;
 
 static pte_t pte_kern[PTE_COUNT][PTE_SIZE] __attribute__ ((aligned(PAGE_SIZE)));
 
@@ -30,13 +30,14 @@ void init_vmm() {
     for(int i = 1; i < PTE_COUNT * PTE_SIZE; i++) {
         pte[i] = (i << 12) | PAGE_PRESENT | PAGE_WRITE;
     }
-    uint32_t pgd_kern_phy_addr = (uint32_t)pgd_kern - PAGE_OFFSET;
+    uintptr_t pgd_kern_phy_addr = (uint32_t)pgd_kern - PAGE_OFFSET;
     // reg page fault interrupt
     reg_inter_handler(14, &page_fault);
 
     // the addr of pgd_kern and pte_kern should be aligned with PAGE_SIZE
     // otherwise switch will cause bug
     enable_paging();
+    kernel_pgd = pgd_kern_phy_addr;
     switch_pgd(pgd_kern_phy_addr);
 
 }
@@ -160,7 +161,7 @@ static void enable_paging() {
 }
 */
 static void switch_pgd(uint32_t pgd_addr) {
-    current_pgd = (pgd_t*)pgd_addr;
+    //current_pgd = (pgd_t*)pgd_addr;
     set_cr3(pgd_addr);
 }
 

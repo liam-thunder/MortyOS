@@ -147,12 +147,11 @@ int kern_init() {
     //init_debug();
     //test_heap();
     //test_initrd_filesystem();
-
+    init_proc();
     enable_interrupt();
-    
 
-    initTimer(200);
-    asm volatile ("int $0x80");
+    init_timer(200);
+    //asm volatile ("int $0x80");
     //asm volatile ("int $0x4");
     //init_ide();
     //test_process();

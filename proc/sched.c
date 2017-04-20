@@ -2,7 +2,14 @@
 #include "libs/list.h"
 #include "types.h"
 #include "libs/common.h"
+#include "libs/stdio.h"
 #include "debug.h"
+
+void timer_callback(registers_t *regs) {
+    //printf("fucker?\n");
+    schedule();
+}
+
 void wakeup_proc(struct proc* p) {
     if(p->state == P_RUNNABLE || p->state == P_ZOMBIE) 
         panic("Wakeup Failed");
@@ -10,6 +17,7 @@ void wakeup_proc(struct proc* p) {
 }
 
 void schedule() {
+    if(!cur_proc->need_resched) return;
     // disable interrupt
     int32_t interrupt_state = save_interrupt();
 

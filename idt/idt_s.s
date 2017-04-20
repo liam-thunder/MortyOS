@@ -86,6 +86,11 @@ IRQ  13,    45
 IRQ  14,    46
 IRQ  15,    47
 
+[GLOBAL fork_ret_s]
+fork_ret_s:
+    mov esp, [esp+4]
+    jmp common_ret
+
 ; use push byte 0x80 will overflow
 [GLOBAL systemcall]
 systemcall:
@@ -95,6 +100,7 @@ systemcall:
     jmp common_stub
 
 [GLOBAL common_stub]
+[GLOBAL common_ret]
 [EXTERN trap_handler]
 common_stub:
     pusha
@@ -110,18 +116,12 @@ common_stub:
     mov fs, ax
     mov gs, ax
     mov ss, ax
-
     push esp
     call trap_handler
     add esp, 4
 
-    jmp common_ret
- .end:
-
-
-[GLOBAL common_ret]
 common_ret:
-    ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
+    ; common_ret
     pop gs
     pop fs
     pop es
@@ -130,4 +130,19 @@ common_ret:
     ; clean up the pushed error code and isr number
     add esp, 8
     iret
-.end:
+ .end:
+
+
+;[GLOBAL common_ret]
+;common_ret:
+;    ; pop edi,esi,ebp,esp,ebx,edx,ecx,eax
+;    pop gs
+;    pop fs
+;    pop es
+;    pop ds
+;    popa
+;    ; clean up the pushed error code and isr number
+;    add esp, 8
+;    iret
+;.end:;
+

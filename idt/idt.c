@@ -151,3 +151,4 @@ void trap_handler(registers_t *regs) {
 void reg_inter_handler(uint8_t n, interrupt_handler_t h) {
     inter_handlers[n] = h;
 }
+

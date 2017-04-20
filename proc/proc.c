@@ -1,11 +1,12 @@
 #include "proc/proc.h"
 #include "mem/heap.h"
 #include "mem/pmm.h"
-#include "mem/vmm.h"
 #include "debug.h"
 #include "mem/gdt.h"
 #include "libs/common.h"
 #include "libs/stdio.h"
+#include "proc/sched.h"
+#include "idt.h"
 
 // static function declaration
 
@@ -16,6 +17,8 @@ static int32_t setup_mem(uint32_t clone_flag, struct proc *p);
 static int32_t setup_stack(struct proc *p, uintptr_t stack, registers_t *reg);
 
 static void forkret();
+
+void fork_ret_s(registers_t* reg);
 
 static int32_t get_pid();
 
@@ -47,6 +50,8 @@ void init_proc() {
     set_proc_name(idle_proc, "idle");
 
     proc_num++;
+    // current process is idle_proc
+    // and next process is start_proc
     cur_proc = idle_proc;
 
     int32_t pid = init_kernel_thread(init_thread_fun, "Hello Proc", 0);
@@ -108,8 +113,8 @@ int32_t do_fork(uint32_t clone_flag, uintptr_t stack, registers_t* reg) {
     proc_num++;
 
     recover_interrupt(interrupt_state);
-    // need to wake up the process
-    // todo...
+    
+    wakeup_proc(p);
 
     ret = p->pid;
 
@@ -132,8 +137,9 @@ void proc_run(struct proc* p) {
 
     cur_proc = p;
     set_esp0(next->kstack + STACK_SIZE);
-    
-
+    set_cr3(next->cr3);
+    switch_to(&(prev->ctx), &(next->ctx));
+    recover_interrupt(interrupt_state);
 }
 
 // static function imple
@@ -154,7 +160,7 @@ struct proc* alloc_proc() {
     p->pgd = NULL;
     memset(&(p->ctx), 0, sizeof(p->ctx));
     p->reg = NULL;
-    p->cr3 = 0;
+    p->cr3 = kernel_pgd;
     p->flag = 0;
     memset(p->name, 0, PROC_NAME_LEN);
     return p;
@@ -179,6 +185,7 @@ int32_t setup_stack(struct proc *p, uintptr_t stack, registers_t *reg) {
         kfree(p);
         return -1;
     }
+    alloc_stack += PAGE_OFFSET;
     p->kstack = alloc_stack;
 
     p->reg = (registers_t*)(p->kstack + STACK_SIZE) - 1;
@@ -198,8 +205,9 @@ int32_t setup_stack(struct proc *p, uintptr_t stack, registers_t *reg) {
 
 void forkret() {
     // set esp to cur_proc's esp
-    asm volatile("mov %0, %%esp" : : "r" (cur_proc->reg->esp));
-    common_ret();
+    //asm volatile("mov %0, %%esp" : : "r" (cur_proc->reg->esp));
+    //common_ret();
+    fork_ret_s(cur_proc->reg);
 }
 
 // very naive way to allocate pid
